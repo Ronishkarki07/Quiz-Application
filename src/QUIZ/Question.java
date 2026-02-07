@@ -21,27 +21,36 @@ public class Question {
         this.difficultyLevel = difficultyLevel;
     }
 
-    public String getQuestionText() { return questionText; }
+    public String getQuestionText() {
+        return questionText;
+    }
 
     // Return all 4 options
     public String[] getOptions() {
         return new String[]{optionA, optionB, optionC, optionD};
     }
 
-    public String getDifficultyLevel() { return difficultyLevel; }
+    public String getDifficultyLevel() {
+        return difficultyLevel;
+    }
 
     /**
      * Checks if the selected index (0-3) matches the correct letter (A-D).
      * @param selectedIndex 0 for A, 1 for B, 2 for C, 3 for D
      */
     public boolean isCorrect(int selectedIndex) {
-        String selectedLetter = "";
-        switch (selectedIndex) {
-            case 0: selectedLetter = "A"; break;
-            case 1: selectedLetter = "B"; break;
-            case 2: selectedLetter = "C"; break;
-            case 3: selectedLetter = "D"; break;
+        try {
+            // Case 1: DB stores index as String "0", "1", "2", "3"
+            int correctIndex = Integer.parseInt(correctOptionLetter);
+            return selectedIndex == correctIndex;
+        } catch (NumberFormatException e) {
+            // Case 2: DB stores "A", "B", "C", "D"
+            String selectedLetter = "";
+            if (selectedIndex == 0) selectedLetter = "A";
+            if (selectedIndex == 1) selectedLetter = "B";
+            if (selectedIndex == 2) selectedLetter = "C";
+            if (selectedIndex == 3) selectedLetter = "D";
+            return correctOptionLetter.equalsIgnoreCase(selectedLetter);
         }
-        return selectedLetter.equalsIgnoreCase(correctOptionLetter);
     }
 }

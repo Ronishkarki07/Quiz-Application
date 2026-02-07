@@ -1,5 +1,7 @@
 package QUIZ;
 
+import java.util.Arrays;
+
 public class Name {
     private String firstName;
     private String middleName;
@@ -57,4 +59,6 @@ public class Name {
         initials += lastName.charAt(0);
         return initials.toUpperCase();
     }
+
+
 }

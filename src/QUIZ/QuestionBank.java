@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class QuestionBank {
     private ArrayList<Question> allQuestions;
@@ -15,6 +16,7 @@ public class QuestionBank {
     }
 
     private void loadQuestionsFromDB() {
+        allQuestions.clear();
         String sql = "SELECT * FROM Questions"; // Matches your table name
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -41,11 +43,24 @@ public class QuestionBank {
     }
 
     public ArrayList<Question> getQuestionsForLevel(String level) {
+        // Reload to ensure we have the latest added questions from Admin Panel
+        loadQuestionsFromDB();
+
         ArrayList<Question> filtered = new ArrayList<>();
+
+        // Filter by Level
         for (Question q : allQuestions) {
             if (q.getDifficultyLevel().equalsIgnoreCase(level)) {
                 filtered.add(q);
             }
+        }
+
+        // Shuffle
+        Collections.shuffle(filtered);
+
+        // Return max 5
+        if (filtered.size() > 5) {
+            return new ArrayList<>(filtered.subList(0, 5));
         }
         return filtered;
     }

@@ -41,8 +41,8 @@ public class QuizMainFrame extends JFrame {
 
         // ADMIN SCREENS
         mainPanel.add(new AdminLoginPanel(this), "ADMIN_LOGIN");
-        mainPanel.add(new AdminDashboardPanel(this), "ADMIN_DASHBOARD"); // NEW
-        mainPanel.add(new AddQuestionPanel(this), "ADD_QUESTION");       // NEW
+        mainPanel.add(new AdminDashboardPanel(this), "ADMIN_DASHBOARD");
+        mainPanel.add(new AddQuestionPanel(this), "ADD_QUESTION");
 
         // USER SCREENS
         mainPanel.add(new LoginPanel(this), "LOGIN");
@@ -55,10 +55,13 @@ public class QuizMainFrame extends JFrame {
         mainPanel.add(leaderboardPanel, "LEADERBOARD");
 
         add(mainPanel);
+
+        // Start at Role Selection
         cardLayout.show(mainPanel, "ROLE_SELECTION");
     }
 
     public void showCard(String cardName) {
+        // Refresh data before showing screens
         if (cardName.equals("MY_SCORES")) scorePanel.refresh();
         if (cardName.equals("LEADERBOARD")) leaderboardPanel.refresh();
         if (cardName.equals("REPORT")) reportPanel.refresh();
@@ -76,21 +79,36 @@ public class QuizMainFrame extends JFrame {
     // --- Quiz Logic ---
     public void startQuiz(String level) {
         if (currentCompetitor != null) currentCompetitor.setCompetitorLevel(level);
+
+        // This gets 5 random questions from the DB for the selected level
         this.currentQuestions = questionBank.getQuestionsForLevel(level);
 
         if (currentQuestions.size() < 5) {
-            JOptionPane.showMessageDialog(this, "Not enough questions for " + level);
+            JOptionPane.showMessageDialog(this, "Not enough questions in DB for " + level);
         } else {
             quizPanel.setupQuiz(currentQuestions);
             showCard("QUIZ");
         }
     }
 
-    public void saveQuizScore(int[] scores) {
+    // --- NEW: Save Attempt Logic ---
+    public void saveQuizAttempt(int totalScore) {
         if (currentCompetitor != null) {
-            currentCompetitor.setScores(scores);
-            try { competitorList.saveCompetitor(currentCompetitor); } catch (Exception e) { e.printStackTrace(); }
+            // Add this score (e.g., 4) to the next empty slot (Attempt 1, Attempt 2...)
+            boolean added = currentCompetitor.addQuizAttemptScore(totalScore);
+
+            if (added) {
+                try {
+                    competitorList.saveCompetitor(currentCompetitor);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Error saving score to database.");
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "You have reached the maximum of 5 attempts!");
+            }
         }
+        // Go to Report screen to see results
         showCard("REPORT");
     }
 
