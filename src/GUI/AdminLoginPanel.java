@@ -28,7 +28,6 @@ public class AdminLoginPanel extends JPanel {
 
         // --- 2. Username Label ---
         gbc.gridy++;
-        // REMOVED SwingConstants.CENTER to align left
         JLabel userLabel = new JLabel("Username");
         userLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         userLabel.setForeground(Color.DARK_GRAY);
@@ -44,7 +43,6 @@ public class AdminLoginPanel extends JPanel {
 
         // --- 4. Password Label ---
         gbc.gridy++;
-        // REMOVED SwingConstants.CENTER to align left
         JLabel passLabel = new JLabel("Password");
         passLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         passLabel.setForeground(Color.DARK_GRAY);
@@ -79,6 +77,11 @@ public class AdminLoginPanel extends JPanel {
 
             if(u.equals("admin") && p.equals("admin123")) {
                 JOptionPane.showMessageDialog(this, "Admin Login Successful!");
+
+                // *** CRITICAL FIX: Ensure no user is logged in ***
+                // This prevents the "Back" buttons in other panels from redirecting to the User Dashboard
+                mainFrame.setCurrentUser(null);
+
                 userField.setText("");
                 passField.setText("");
                 mainFrame.showCard("ADMIN_DASHBOARD");

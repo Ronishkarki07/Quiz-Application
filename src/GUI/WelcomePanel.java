@@ -3,6 +3,8 @@ package GUI;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class WelcomePanel extends JPanel {
     private QuizMainFrame mainFrame;
@@ -15,48 +17,58 @@ public class WelcomePanel extends JPanel {
         setBorder(new EmptyBorder(40, 40, 40, 40));
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(15, 0, 15, 0); // Spacing between items
+        gbc.insets = new Insets(10, 0, 10, 0); // Spacing between items
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         // --- 1. Welcome Message ---
         welcomeLabel = new JLabel("Welcome!");
-        welcomeLabel.setFont(new Font("SansSerif", Font.BOLD, 32));
-        welcomeLabel.setForeground(Color.DARK_GRAY);
+        welcomeLabel.setFont(new Font("SansSerif", Font.BOLD, 36));
+        welcomeLabel.setForeground(new Color(50, 50, 50)); // Dark Grey
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        gbc.insets = new Insets(0, 0, 40, 0); // Extra space below title
         add(welcomeLabel, gbc);
 
-        // --- 2. Start Quiz Button (Primary Action) ---
+        // --- 2. Subtitle ---
         gbc.gridy++;
-        gbc.insets = new Insets(0, 0, 15, 0); // Standard spacing
+        JLabel subtitle = new JLabel("Ready to challenge yourself?");
+        subtitle.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        subtitle.setForeground(Color.GRAY);
+        subtitle.setHorizontalAlignment(SwingConstants.CENTER);
+        gbc.insets = new Insets(0, 0, 40, 0); // Extra space below subtitle
+        add(subtitle, gbc);
+
+        // --- 3. Start Quiz Button (Primary) ---
+        gbc.gridy++;
+        gbc.insets = new Insets(0, 0, 15, 0);
+
         JButton startBtn = new JButton("START QUIZ");
-        stylePrimaryButton(startBtn);
+        styleButton(startBtn, new Color(65, 105, 225), Color.WHITE); // Blue Background
         startBtn.addActionListener(e -> mainFrame.showCard("LEVEL"));
         add(startBtn, gbc);
 
-        // --- 3. My Scores Button (Secondary Action) ---
+        // --- 4. My Scores Button (Secondary) ---
         gbc.gridy++;
         JButton myScoresBtn = new JButton("MY SCORES");
-        styleSecondaryButton(myScoresBtn);
+        styleButton(myScoresBtn, Color.WHITE, new Color(65, 105, 225)); // White Background
+        // Add a border for the white button so it's visible
+        myScoresBtn.setBorder(BorderFactory.createLineBorder(new Color(65, 105, 225), 2));
         myScoresBtn.addActionListener(e -> mainFrame.showCard("MY_SCORES"));
         add(myScoresBtn, gbc);
 
-        // --- 4. Leaderboard Button (Secondary Action) ---
+        // --- 5. Leaderboard Button (Secondary) ---
         gbc.gridy++;
         JButton leaderBtn = new JButton("LEADERBOARD");
-        styleSecondaryButton(leaderBtn);
+        styleButton(leaderBtn, Color.WHITE, new Color(65, 105, 225));
+        leaderBtn.setBorder(BorderFactory.createLineBorder(new Color(65, 105, 225), 2));
         leaderBtn.addActionListener(e -> mainFrame.showCard("LEADERBOARD"));
         add(leaderBtn, gbc);
 
-        // --- 5. Logout Link ---
+        // --- 6. Logout Link ---
         gbc.gridy++;
-        gbc.insets = new Insets(30, 0, 0, 0); // Extra space above logout
-        JButton logoutBtn = new JButton("Logout");
+        gbc.insets = new Insets(30, 0, 0, 0);
+        JButton logoutBtn = new JButton("Log out");
         styleLinkButton(logoutBtn);
-        logoutBtn.setBackground(Color.DARK_GRAY);
-        logoutBtn.setForeground(Color.RED);
         logoutBtn.addActionListener(e -> {
             mainFrame.setCurrentUser(null);
             mainFrame.showCard("LOGIN");
@@ -66,38 +78,39 @@ public class WelcomePanel extends JPanel {
 
     public void updateWelcomeText() {
         if(mainFrame.getCurrentUser() != null) {
-            welcomeLabel.setText("Welcome, " + mainFrame.getCurrentUser().getCompetitorName().getFirstName() + "!");
+            String firstName = mainFrame.getCurrentUser().getCompetitorName().getFirstName();
+            welcomeLabel.setText("Welcome, " + firstName + "!");
         }
     }
 
-    // --- Helper: Primary Button Style (Blue Filled) ---
-    private void stylePrimaryButton(JButton b) {
-        b.setBackground(new Color(65, 105, 225)); // Royal Blue
-        b.setForeground(Color.WHITE);
-        b.setFont(new Font("SansSerif", Font.BOLD, 16));
-        b.setFocusPainted(false);
-        b.setOpaque(true);
-        b.setBorderPainted(false);
-        b.setPreferredSize(new Dimension(280, 50)); // Wide and tall
-    }
+    // --- Simple Standard Button Styling ---
+    private void styleButton(JButton btn, Color bgColor, Color textColor) {
+        btn.setFont(new Font("SansSerif", Font.BOLD, 14));
+        btn.setBackground(bgColor);
+        btn.setForeground(textColor);
+        btn.setFocusPainted(false);
+        // btn.setBorderPainted(false); // Removed to allow borders on white buttons
+        btn.setOpaque(true);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setPreferredSize(new Dimension(280, 50));
 
-    // --- Helper: Secondary Button Style (White with Border) ---
-    private void styleSecondaryButton(JButton b) {
-        b.setBackground(Color.WHITE);
-        b.setForeground(new Color(65, 105, 225)); // Blue Text
-        b.setFont(new Font("SansSerif", Font.BOLD, 14));
-        b.setFocusPainted(false);
-        b.setOpaque(true);
-        // Blue Border
-        b.setBorder(BorderFactory.createLineBorder(new Color(65, 105, 225), 2));
-        b.setPreferredSize(new Dimension(280, 45));
+        // Optional: Simple Hover Effect
+        btn.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                if (bgColor != Color.WHITE) btn.setBackground(bgColor.darker());
+            }
+            public void mouseExited(MouseEvent e) {
+                if (bgColor != Color.WHITE) btn.setBackground(bgColor);
+            }
+        });
     }
 
     private void styleLinkButton(JButton b) {
         b.setBorderPainted(false);
         b.setContentAreaFilled(false);
-        b.setForeground(Color.GRAY);
-        b.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        b.setFocusPainted(false);
+        b.setForeground(new Color(220, 53, 69)); // Red
+        b.setFont(new Font("SansSerif", Font.BOLD, 14));
         b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
 }

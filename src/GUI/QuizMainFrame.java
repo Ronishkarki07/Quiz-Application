@@ -91,10 +91,11 @@ public class QuizMainFrame extends JFrame {
         }
     }
 
-    // --- NEW: Save Attempt Logic ---
+    // --- NEW: Save Attempt Logic (Replaces old saveQuizScore) ---
     public void saveQuizAttempt(int totalScore) {
         if (currentCompetitor != null) {
             // Add this score (e.g., 4) to the next empty slot (Attempt 1, Attempt 2...)
+            // Ensure your RONCompetitor class uses -1 logic for empty slots!
             boolean added = currentCompetitor.addQuizAttemptScore(totalScore);
 
             if (added) {

@@ -16,16 +16,36 @@ public class ReportPanel extends JPanel {
         this.mainFrame = frame;
         setLayout(new BorderLayout());
 
-        model = new DefaultTableModel(new String[]{"ID", "Name", "Level", "Scores", "Overall"}, 0);
-        add(new JScrollPane(new JTable(model)), BorderLayout.CENTER);
+        JLabel title = new JLabel("Player Report", SwingConstants.CENTER);
+        title.setFont(new Font("SansSerif", Font.BOLD, 24));
+        title.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        add(title, BorderLayout.NORTH);
 
+        // Table
+        model = new DefaultTableModel(new String[]{"ID", "Name", "Level", "Scores", "Overall"}, 0);
+        JTable table = new JTable(model);
+        add(new JScrollPane(table), BorderLayout.CENTER);
+
+        // Stats Box
         stats = new JTextArea(5, 40);
         stats.setEditable(false);
+        stats.setBorder(BorderFactory.createTitledBorder("Performance Stats"));
         add(new JScrollPane(stats), BorderLayout.SOUTH);
 
-        JButton home = new JButton("Home");
-        home.addActionListener(e -> frame.showCard("WELCOME"));
-        add(home, BorderLayout.NORTH);
+        // --- SMART BACK BUTTON ---
+        JButton back = new JButton("Back");
+        back.addActionListener(e -> {
+            if (mainFrame.getCurrentUser() != null) {
+                frame.showCard("WELCOME");       // User Dashboard
+            } else {
+                frame.showCard("ADMIN_DASHBOARD"); // Admin Dashboard
+            }
+        });
+
+        // Add button to top-left or bottom (Added to a separate panel for layout safety)
+        JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        topPanel.add(back);
+        add(topPanel, BorderLayout.PAGE_START);
     }
 
     public void refresh() {
@@ -38,6 +58,6 @@ public class ReportPanel extends JPanel {
                     String.format("%.1f", c.getOverallScore())});
             if (top == null || c.getOverallScore() > top.getOverallScore()) top = c;
         }
-        if (top != null) stats.setText("Top Performer: " + top.getCompetitorName().getFullName());
+        if (top != null) stats.setText("Top Performer: " + top.getCompetitorName().getFullName() + "\nScore: " + top.getOverallScore());
     }
 }

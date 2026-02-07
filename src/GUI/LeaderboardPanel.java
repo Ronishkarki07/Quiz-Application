@@ -17,6 +17,7 @@ public class LeaderboardPanel extends JPanel {
 
         JLabel t = new JLabel("Global Leaderboard", SwingConstants.CENTER);
         t.setFont(new Font("SansSerif", Font.BOLD, 24));
+        t.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
         add(t, BorderLayout.NORTH);
 
         // Table Setup
@@ -32,16 +33,19 @@ public class LeaderboardPanel extends JPanel {
         JButton back = new JButton("Back");
         back.setFont(new Font("SansSerif", Font.BOLD, 14));
         back.addActionListener(e -> {
-            // Check if a normal user is logged in
+            // Check who is logged in
             if (mainFrame.getCurrentUser() != null) {
-                // If User: Go to User Welcome Screen
+                // If a User is logged in, go to User Welcome
                 frame.showCard("WELCOME");
             } else {
-                // If Null (Admin): Go to Admin Dashboard
+                // If NO User is logged in (meaning it's Admin), go to Admin Dashboard
                 frame.showCard("ADMIN_DASHBOARD");
             }
         });
-        add(back, BorderLayout.SOUTH);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(back);
+        add(buttonPanel, BorderLayout.SOUTH);
     }
 
     public void refresh() {

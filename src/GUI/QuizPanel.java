@@ -29,52 +29,67 @@ public class QuizPanel extends JPanel {
         setLayout(new BorderLayout());
         setBackground(new Color(245, 247, 250)); // Very light grey background
 
-        // --- 1. HEADER PANEL (Question) ---
+        // --- 1. HEADER PANEL (Compact & Blue) ---
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(new Color(65, 105, 225)); // Royal Blue
-        headerPanel.setBorder(new EmptyBorder(30, 40, 30, 40));
-        headerPanel.setPreferredSize(new Dimension(500, 140));
+        headerPanel.setBorder(new EmptyBorder(20, 30, 20, 30));
+        // Fixed height to prevent excessive stretching
+        headerPanel.setPreferredSize(new Dimension(500, 120));
 
-        // Progress Label (e.g., "Question 1 of 5")
+        // Progress Label
         progressLabel = new JLabel("Question 1 of 5");
-        progressLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
-        progressLabel.setForeground(new Color(200, 200, 255)); // Light Blue
+        progressLabel.setFont(new Font("SansSerif", Font.BOLD, 13));
+        progressLabel.setForeground(new Color(220, 220, 255)); // Light Blue
         headerPanel.add(progressLabel, BorderLayout.NORTH);
 
         // Question Text
-        qTextArea = new JTextArea("Question Text Goes Here");
-        qTextArea.setFont(new Font("SansSerif", Font.BOLD, 20));
+        qTextArea = new JTextArea("Question Text Here");
+        qTextArea.setFont(new Font("SansSerif", Font.BOLD, 18));
         qTextArea.setForeground(Color.WHITE);
-        qTextArea.setBackground(new Color(65, 105, 225)); // Match header bg
+        qTextArea.setBackground(new Color(65, 105, 225));
         qTextArea.setLineWrap(true);
         qTextArea.setWrapStyleWord(true);
         qTextArea.setEditable(false);
+        qTextArea.setBorder(new EmptyBorder(10, 0, 0, 0)); // Spacing from progress label
         headerPanel.add(qTextArea, BorderLayout.CENTER);
 
         add(headerPanel, BorderLayout.NORTH);
 
-        // --- 2. OPTIONS PANEL (Center) ---
-        JPanel bodyPanel = new JPanel();
-        bodyPanel.setLayout(new GridLayout(4, 1, 0, 15)); // 4 rows, spacing 15
+        // --- 2. OPTIONS PANEL (GridBagLayout for Compact Buttons) ---
+        JPanel bodyPanel = new JPanel(new GridBagLayout()); // GridBag prevents stretching
         bodyPanel.setBackground(new Color(245, 247, 250));
-        bodyPanel.setBorder(new EmptyBorder(30, 50, 30, 50));
+        bodyPanel.setBorder(new EmptyBorder(20, 40, 20, 40));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL; // Fill width only
+        gbc.weightx = 1.0;
+        gbc.insets = new Insets(0, 0, 10, 0); // Gap between buttons
 
         options = new JRadioButton[4];
         group = new ButtonGroup();
 
         for (int i = 0; i < 4; i++) {
             options[i] = new JRadioButton();
-            styleOptionCard(options[i]); // Apply custom card style
-            bodyPanel.add(options[i]);
+            styleOptionCard(options[i]);
+
+            // Add to panel with constraints
+            bodyPanel.add(options[i], gbc);
             group.add(options[i]);
+            gbc.gridy++; // Move to next row
         }
+
+        // Add a filler component to push buttons to the top
+        gbc.weighty = 1.0;
+        bodyPanel.add(Box.createGlue(), gbc);
+
         add(bodyPanel, BorderLayout.CENTER);
 
-        // --- 3. FOOTER PANEL (Next Button) ---
+        // --- 3. FOOTER PANEL ---
         JPanel footerPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         footerPanel.setBackground(Color.WHITE);
-        footerPanel.setBorder(new EmptyBorder(15, 20, 15, 40));
-        footerPanel.setPreferredSize(new Dimension(500, 80));
+        footerPanel.setBorder(new EmptyBorder(15, 20, 15, 30));
 
         JButton nextBtn = new JButton("Next Question");
         styleNextButton(nextBtn);
@@ -102,9 +117,7 @@ public class QuizPanel extends JPanel {
             for (int i = 0; i < 4; i++) {
                 options[i].setText(opts[i]);
                 options[i].setSelected(false);
-                // Reset colors
-                options[i].setBackground(Color.WHITE);
-                options[i].setForeground(Color.DARK_GRAY);
+                resetOptionStyle(options[i]);
             }
             group.clearSelection();
         }
@@ -115,7 +128,7 @@ public class QuizPanel extends JPanel {
         for (int i = 0; i < 4; i++) if (options[i].isSelected()) selected = i;
 
         if (selected == -1) {
-            JOptionPane.showMessageDialog(this, "Please select an answer to proceed.");
+            JOptionPane.showMessageDialog(this, "Please select an answer.");
             return;
         }
 
@@ -134,15 +147,16 @@ public class QuizPanel extends JPanel {
         for(int s : localResults) totalCorrect += s;
 
         RONCompetitor user = mainFrame.getCurrentUser();
-
         if(user != null) {
             String summaryText =
                     "Quiz Finished!\n\n" +
                             "Competitor: " + user.getCompetitorName().getFullName() + "\n" +
-                            "Result: " + totalCorrect + " out of 5 correct.\n\n" +
-                            "This score has been saved to your history.";
+                            "Score: " + totalCorrect + " / 5\n\n" +
+                            "Result saved.";
 
-            JOptionPane.showMessageDialog(mainFrame, summaryText, "Quiz Result", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(mainFrame, summaryText, "Result", JOptionPane.INFORMATION_MESSAGE);
+
+            // --- FIX: Using the correct method name from QuizMainFrame ---
             mainFrame.saveQuizAttempt(totalCorrect);
         }
     }
@@ -150,40 +164,48 @@ public class QuizPanel extends JPanel {
     // --- STYLING HELPERS ---
 
     private void styleOptionCard(JRadioButton rb) {
-        rb.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        rb.setFont(new Font("SansSerif", Font.PLAIN, 15));
         rb.setForeground(Color.DARK_GRAY);
         rb.setBackground(Color.WHITE);
         rb.setFocusPainted(false);
         rb.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Create a padding border with a line border
+        // Compact padding (Smaller height)
         rb.setBorder(new CompoundBorder(
-                new LineBorder(new Color(220, 220, 220), 1, true), // Grey border
-                new EmptyBorder(10, 15, 10, 15) // Inner padding
+                new LineBorder(new Color(220, 220, 220), 1, true),
+                new EmptyBorder(12, 15, 12, 15) // Reduced vertical padding
         ));
         rb.setBorderPainted(true);
 
-        // Add Hover Effect
+        // Hover
         rb.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
-                if (!rb.isSelected()) rb.setBackground(new Color(240, 248, 255)); // Alice Blue
+                if (!rb.isSelected()) rb.setBackground(new Color(245, 250, 255));
             }
             public void mouseExited(MouseEvent e) {
                 if (!rb.isSelected()) rb.setBackground(Color.WHITE);
             }
         });
 
-        // Add Selection Effect
+        // Selection Logic
         rb.addActionListener(e -> {
-            // Reset all others
-            for(JRadioButton other : options) {
-                other.setBackground(Color.WHITE);
-                other.setForeground(Color.DARK_GRAY);
-            }
-            // Highlight selected
-            rb.setBackground(new Color(230, 240, 255));
-            rb.setForeground(new Color(65, 105, 225));
+            for(JRadioButton other : options) resetOptionStyle(other);
+            rb.setBackground(new Color(230, 240, 255)); // Light Blue fill
+            rb.setForeground(new Color(30, 60, 150)); // Dark Blue Text
+            rb.setBorder(new CompoundBorder(
+                    new LineBorder(new Color(65, 105, 225), 1, true), // Blue Border
+                    new EmptyBorder(12, 15, 12, 15)
+            ));
         });
+    }
+
+    private void resetOptionStyle(JRadioButton rb) {
+        rb.setBackground(Color.WHITE);
+        rb.setForeground(Color.DARK_GRAY);
+        rb.setBorder(new CompoundBorder(
+                new LineBorder(new Color(220, 220, 220), 1, true),
+                new EmptyBorder(12, 15, 12, 15)
+        ));
     }
 
     private void styleNextButton(JButton b) {
@@ -194,6 +216,5 @@ public class QuizPanel extends JPanel {
         b.setBorder(new EmptyBorder(10, 25, 10, 25));
         b.setOpaque(true);
         b.setBorderPainted(false);
-        b.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
     }
 }
