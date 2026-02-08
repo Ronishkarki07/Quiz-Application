@@ -1,6 +1,11 @@
 package GUI;
 
 import DatabaseConfig.CompetitorList;
+import GUI.Admin.AddQuestionPanel;
+import GUI.Admin.AdminDashboardPanel;
+import GUI.Admin.AdminLoginPanel;
+import GUI.Admin.AdminReportPanel;
+import GUI.User.*;
 import QUIZ.*;
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +25,8 @@ public class QuizMainFrame extends JFrame {
     private QuizPanel quizPanel;
     private ScorePanel scorePanel;
     private LeaderboardPanel leaderboardPanel;
-    private ReportPanel reportPanel;
+    private UserReportPanel reportPanel;
+    private AdminReportPanel adminReportPanel;
     private WelcomePanel welcomePanel;
 
     public QuizMainFrame() {
@@ -33,7 +39,8 @@ public class QuizMainFrame extends JFrame {
         quizPanel = new QuizPanel(this);
         scorePanel = new ScorePanel(this);
         leaderboardPanel = new LeaderboardPanel(this);
-        reportPanel = new ReportPanel(this);
+        reportPanel = new UserReportPanel(this);
+        adminReportPanel = new AdminReportPanel(this);
         welcomePanel = new WelcomePanel(this);
 
         // --- REGISTER ALL SCREENS ---
@@ -43,6 +50,7 @@ public class QuizMainFrame extends JFrame {
         mainPanel.add(new AdminLoginPanel(this), "ADMIN_LOGIN");
         mainPanel.add(new AdminDashboardPanel(this), "ADMIN_DASHBOARD");
         mainPanel.add(new AddQuestionPanel(this), "ADD_QUESTION");
+        mainPanel.add(adminReportPanel, "ADMIN_REPORT");
 
         // USER SCREENS
         mainPanel.add(new LoginPanel(this), "LOGIN");
@@ -64,10 +72,27 @@ public class QuizMainFrame extends JFrame {
         // Refresh data before showing screens
         if (cardName.equals("MY_SCORES")) scorePanel.refresh();
         if (cardName.equals("LEADERBOARD")) leaderboardPanel.refresh();
-        if (cardName.equals("REPORT")) reportPanel.refresh();
+        if (cardName.equals("REPORT")) {
+            reportPanel.setReturnDestination("WELCOME"); // Default to user welcome
+            reportPanel.refresh();
+        }
+        if (cardName.equals("ADMIN_REPORT")) adminReportPanel.refresh();
         if (cardName.equals("WELCOME")) welcomePanel.updateWelcomeText();
 
         cardLayout.show(mainPanel, cardName);
+    }
+
+    // Method to show user report with specific return destination
+    public void showUserReportWithReturn(String returnDestination) {
+        reportPanel.setReturnDestination(returnDestination);
+        reportPanel.refresh();
+        cardLayout.show(mainPanel, "REPORT");
+    }
+
+    // Method to show admin report
+    public void showAdminReport() {
+        adminReportPanel.refresh();
+        cardLayout.show(mainPanel, "ADMIN_REPORT");
     }
 
     // --- Getters & Setters ---

@@ -1,5 +1,6 @@
-package GUI;
+package GUI.User;
 
+import GUI.QuizMainFrame;
 import QUIZ.RONCompetitor;
 
 import javax.swing.*;

@@ -1,13 +1,12 @@
-package GUI;
+package GUI.User;
 
-import DatabaseConfig.CompetitorList;
+import GUI.QuizMainFrame;
 import QUIZ.Name;
 import QUIZ.RONCompetitor;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.util.Arrays;
 
 public class SignupPanel extends JPanel {
     private QuizMainFrame mainFrame;
@@ -83,7 +82,7 @@ public class SignupPanel extends JPanel {
                 RONCompetitor newComp = new RONCompetitor(id, name, "Beginner", country, age, pass);
 
                 // Initialize with -1 for "Empty" slots
-                newComp.setScores(new int[]{-1, -1, -1, -1, -1});
+                newComp.setScores(new int[]{0, 0, 0, 0, 0});
 
                 mainFrame.getCompetitorList().saveCompetitor(newComp);
                 JOptionPane.showMessageDialog(this, "Account Created! Please Login.");

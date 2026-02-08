@@ -1,4 +1,6 @@
-package GUI;
+package GUI.Admin;
+
+import GUI.QuizMainFrame;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -20,7 +22,7 @@ public class AdminLoginPanel extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL; // This ensures labels stretch to match text fields
 
         // --- 1. Title ---
-        JLabel title = new JLabel("Admin Portal", SwingConstants.CENTER);
+        JLabel title = new JLabel("Admin Login", SwingConstants.CENTER);
         title.setFont(new Font("SansSerif", Font.BOLD, 28));
         title.setForeground(new Color(220, 53, 69));
         gbc.insets = new Insets(0, 0, 30, 0); // More space under title

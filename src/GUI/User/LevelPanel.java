@@ -1,4 +1,6 @@
-package GUI;
+package GUI.User;
+
+import GUI.QuizMainFrame;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

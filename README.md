@@ -28,6 +28,9 @@ A Java Swing-based quiz competition platform for Players to test their knowledge
 2. **Run Application**:
    - Run `GUI/QuizMainFrame.java` to start the application (Main.java is a placeholder).
 
-## Default Credentials
+## Admin Credentials
 
-- **Player ID**: `C001`, **Password**: `pass123`
+- **Player ID**: `admin`, **Password**: `admin123`
+
+## User Credentials
+- **Player ID**: `14`, **Password**: `Ronish@123`
