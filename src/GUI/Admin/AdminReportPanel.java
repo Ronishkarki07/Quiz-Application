@@ -42,7 +42,7 @@ public class AdminReportPanel extends JPanel {
 
         JButton searchBtn = new JButton("Search");
         stylePrimaryButton(searchBtn);
-        searchBtn.setPreferredSize(new Dimension(80, 30));
+        searchBtn.setPreferredSize(new Dimension(100, 30));
         searchBtn.addActionListener(e -> refresh());
 
         JButton clearBtn = new JButton("Clear");
@@ -94,7 +94,7 @@ public class AdminReportPanel extends JPanel {
         stylePrimaryButton(backBtn);
         backBtn.addActionListener(e -> mainFrame.showCard("ADMIN_DASHBOARD"));
 
-        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         btnPanel.setBackground(new Color(245, 247, 250));
         btnPanel.add(backBtn);
         bottomPanel.add(btnPanel, BorderLayout.SOUTH);
