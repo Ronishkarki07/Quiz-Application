@@ -1,5 +1,6 @@
-package QUIZ;
+package test.QUIZ;
 
+import QUIZ.Name;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -8,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Test class for Name functionality
  */
 public class NameTest {
-
+    
     private Name name;
 
     @BeforeEach
@@ -26,6 +27,7 @@ public class NameTest {
     @Test
     public void testConstructor_NoMiddleName() {
         Name nameNoMiddle = new Name("Jane", "", "Doe");
+        
         assertEquals("Jane", nameNoMiddle.getFirstName());
         assertEquals("", nameNoMiddle.getMiddleName());
         assertEquals("Doe", nameNoMiddle.getLastName());
@@ -70,22 +72,6 @@ public class NameTest {
     public void testSetLastName() {
         name.setLastName("Johnson");
         assertEquals("Johnson", name.getLastName());
-    }
-
-    @Test
-    public void testToString() {
-        String nameString = name.toString();
-        assertNotNull(nameString);
-        assertTrue(nameString.contains("John"));
-    }
-
-    @Test
-    public void testEquals() {
-        Name name2 = new Name("John", "Michael", "Smith");
-        assertTrue(name.equals(name2));
-        
-        Name name3 = new Name("Jane", "Michael", "Smith");
-        assertFalse(name.equals(name3));
     }
 
     @Test

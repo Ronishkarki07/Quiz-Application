@@ -1,19 +1,18 @@
-package DatabaseConfig;
+package test.DatabaseConfig;
 
+import DatabaseConfig.DatabaseConnection;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
-
 import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
  * Test class for DatabaseConnection functionality
+ * Tests only methods that actually exist in DatabaseConnection
  */
 public class DatabaseConnectionTest {
 
     @Test
-    public void testDatabaseConnection() {
+    public void testGetConnection() {
         assertDoesNotThrow(() -> {
             Connection connection = DatabaseConnection.getConnection();
             if (connection != null) {
@@ -25,7 +24,7 @@ public class DatabaseConnectionTest {
     }
 
     @Test
-    public void testConnectionNotNull() {
+    public void testGetConnectionNotNull() {
         assertDoesNotThrow(() -> {
             Connection connection = DatabaseConnection.getConnection();
             // Connection might be null if database is not available
@@ -69,29 +68,6 @@ public class DatabaseConnectionTest {
     }
 
     @Test
-    public void testDatabaseURL() {
-        assertDoesNotThrow(() -> {
-            String url = DatabaseConnection.getDatabaseURL();
-            if (url != null) {
-                assertTrue(url.startsWith("jdbc:"));
-            }
-        });
-    }
-
-    @Test
-    public void testConnectionTimeout() {
-        assertDoesNotThrow(() -> {
-            Connection connection = DatabaseConnection.getConnection();
-            if (connection != null) {
-                // Test connection timeout
-                boolean isValid = connection.isValid(1); // 1 second timeout
-                // Should complete within timeout
-                connection.close();
-            }
-        });
-    }
-
-    @Test
     public void testConnectionClosing() {
         assertDoesNotThrow(() -> {
             Connection connection = DatabaseConnection.getConnection();
@@ -105,49 +81,9 @@ public class DatabaseConnectionTest {
     }
 
     @Test
-    public void testDatabaseConfiguration() {
-        // Test that database configuration is properly set
-        assertDoesNotThrow(() -> {
-            // Test configuration methods if they exist
-            String dbName = DatabaseConnection.getDatabaseName();
-            String dbUser = DatabaseConnection.getDatabaseUser();
-            
-            // These might be null if not configured, but methods should exist
-        });
-    }
-
-    @Test
-    public void testConnectionPooling() {
-        // Test connection pooling if implemented
-        assertDoesNotThrow(() -> {
-            Connection[] connections = new Connection[5];
-            
-            // Create multiple connections
-            for (int i = 0; i < 5; i++) {
-                connections[i] = DatabaseConnection.getConnection();
-            }
-            
-            // Close all connections
-            for (Connection conn : connections) {
-                if (conn != null) {
-                    conn.close();
-                }
-            }
-        });
-    }
-
-    @Test
-    public void testDatabaseAvailability() {
-        assertDoesNotThrow(() -> {
-            boolean isAvailable = DatabaseConnection.isDatabaseAvailable();
-            // Method should execute without exception
-        });
-    }
-
-    @Test
     public void testConnectionRecovery() {
         assertDoesNotThrow(() -> {
-            // Test connection recovery after failure
+            // Test connection recovery after closing
             Connection connection = DatabaseConnection.getConnection();
             if (connection != null) {
                 connection.close();

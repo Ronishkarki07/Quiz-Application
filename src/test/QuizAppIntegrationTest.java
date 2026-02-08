@@ -1,6 +1,7 @@
+package test;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.AfterEach;
 import static org.junit.jupiter.api.Assertions.*;
 
 import QUIZ.*;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 
 /**
  * Integration tests for QuizApp - tests interaction between components
+ * Tests only methods that actually exist in the classes
  */
 public class QuizAppIntegrationTest {
 
@@ -37,21 +39,11 @@ public class QuizAppIntegrationTest {
         competitorList = new CompetitorList();
     }
 
-    @AfterEach
-    public void tearDown() {
-        // Clean up test data
-        try {
-            competitorList.removeCompetitor("INT001");
-        } catch (Exception e) {
-            // Ignore cleanup errors
-        }
-    }
-
     @Test
     public void testFullQuizWorkflow() {
         assertDoesNotThrow(() -> {
-            // 1. Register competitor
-            boolean registered = competitorList.addCompetitor(testCompetitor);
+            // 1. Save competitor to database
+            competitorList.saveCompetitor(testCompetitor);
             
             // 2. Get questions for quiz
             ArrayList<Question> questions = questionBank.getQuestionsForLevel("Beginner");
@@ -70,7 +62,7 @@ public class QuizAppIntegrationTest {
                 assertTrue(scoreAdded);
                 
                 // 5. Update competitor in database
-                boolean updated = competitorList.updateCompetitor(testCompetitor);
+                competitorList.saveCompetitor(testCompetitor);
             }
         });
     }
@@ -85,7 +77,7 @@ public class QuizAppIntegrationTest {
                 assertTrue(dbConnection.isValid(5));
                 
                 // Test question loading
-                ArrayList<Question> questions = questionBank.getAllQuestions();
+                ArrayList<Question> questions = questionBank.getQuestionsForLevel("Beginner");
                 assertNotNull(questions);
                 
                 // Test competitor operations
@@ -108,8 +100,8 @@ public class QuizAppIntegrationTest {
             double overallScore = testCompetitor.getOverallScore();
             assertEquals(85.0, overallScore, 0.01); // Average of 80, 85, 90
             
-            // Update in database
-            competitorList.updateCompetitor(testCompetitor);
+            // Save updated competitor
+            competitorList.saveCompetitor(testCompetitor);
         });
     }
 
@@ -141,10 +133,10 @@ public class QuizAppIntegrationTest {
         assertDoesNotThrow(() -> {
             // Add competitor with score
             testCompetitor.addQuizAttemptScore(95);
-            competitorList.addCompetitor(testCompetitor);
+            competitorList.saveCompetitor(testCompetitor);
             
-            // Generate leaderboard
-            String leaderboard = Manager.getLeaderboard();
+            // Generate leaderboard using CompetitorList method
+            ArrayList<RONCompetitor> leaderboard = competitorList.getLeaderboard();
             assertNotNull(leaderboard);
         });
     }
@@ -164,28 +156,21 @@ public class QuizAppIntegrationTest {
             competitor1.addQuizAttemptScore(75);
             competitor2.addQuizAttemptScore(90);
             
-            // Add to list
-            competitorList.addCompetitor(competitor1);
-            competitorList.addCompetitor(competitor2);
+            // Save to database
+            competitorList.saveCompetitor(competitor1);
+            competitorList.saveCompetitor(competitor2);
             
-            // Verify they're added
-            assertTrue(competitorList.competitorExists("INT002"));
-            assertTrue(competitorList.competitorExists("INT003"));
-            
-            // Clean up
-            competitorList.removeCompetitor("INT002");
-            competitorList.removeCompetitor("INT003");
+            // Verify they can be found
+            assertNotNull(competitorList.findCompetitor("INT002"));
+            assertNotNull(competitorList.findCompetitor("INT003"));
         });
     }
 
     @Test
     public void testDataPersistence() {
         assertDoesNotThrow(() -> {
-            // Add competitor
-            competitorList.addCompetitor(testCompetitor);
-            
-            // Save to database
-            competitorList.saveToDatabase();
+            // Save competitor
+            competitorList.saveCompetitor(testCompetitor);
             
             // Create new list and load from database
             CompetitorList newList = new CompetitorList();
@@ -232,6 +217,27 @@ public class QuizAppIntegrationTest {
                 if (score > 0) filledSlots++;
             }
             assertEquals(5, filledSlots);
+        });
+    }
+
+    @Test
+    public void testLoginWorkflow() {
+        assertDoesNotThrow(() -> {
+            // Save competitor to database
+            competitorList.saveCompetitor(testCompetitor);
+            
+            // Test login success
+            String loginResult = competitorList.checkLogin("INT001", "testpass123");
+            // Should return "SUCCESS" or handle database errors gracefully
+            assertNotNull(loginResult);
+            
+            // Test wrong password
+            String wrongPassResult = competitorList.checkLogin("INT001", "wrongpass");
+            assertNotNull(wrongPassResult);
+            
+            // Test non-existent user
+            String notFoundResult = competitorList.checkLogin("NONEXISTENT", "password");
+            assertNotNull(notFoundResult);
         });
     }
 }
