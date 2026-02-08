@@ -2,6 +2,7 @@ package GUI.User;
 
 import GUI.QuizMainFrame;
 import QUIZ.RONCompetitor;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;

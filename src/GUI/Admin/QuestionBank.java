@@ -1,6 +1,7 @@
-package QUIZ;
+package GUI.Admin;
 
 import DatabaseConfig.DatabaseConnection;
+import QUIZ.Question;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;

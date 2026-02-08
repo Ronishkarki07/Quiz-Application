@@ -5,6 +5,7 @@ import GUI.Admin.AddQuestionPanel;
 import GUI.Admin.AdminDashboardPanel;
 import GUI.Admin.AdminLoginPanel;
 import GUI.Admin.AdminReportPanel;
+import GUI.Admin.QuestionBank;
 import GUI.User.*;
 import QUIZ.*;
 import javax.swing.*;
