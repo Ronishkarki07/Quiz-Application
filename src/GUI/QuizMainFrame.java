@@ -137,8 +137,4 @@ public class QuizMainFrame extends JFrame {
         // Go to Report screen to see results
         showCard("REPORT");
     }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new QuizMainFrame().setVisible(true));
-    }
 }

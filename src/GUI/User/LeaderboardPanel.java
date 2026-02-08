@@ -104,7 +104,7 @@ public class LeaderboardPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
 
         // --- 3. BOTTOM PANEL ---
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         bottomPanel.setBackground(new Color(245, 247, 250));
         bottomPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 

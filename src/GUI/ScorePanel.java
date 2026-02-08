@@ -10,8 +10,9 @@ import java.util.Arrays;
 
 public class ScorePanel extends JPanel {
     private QuizMainFrame mainFrame;
-    private JLabel nameL, levelL, scoreL;
+    private JLabel nameL, levelL, scoreL, progressLabel, achievementLabel;
     private JPanel scoresPanel;
+    private JProgressBar progressBar;
 
     public ScorePanel(QuizMainFrame frame) {
         this.mainFrame = frame;
@@ -23,20 +24,20 @@ public class ScorePanel extends JPanel {
         mainCard.setBorder(BorderFactory.createCompoundBorder(
                 new LineBorder(new Color(200, 220, 255), 2, true),
                 new EmptyBorder(30, 40, 30, 40)));
-        mainCard.setPreferredSize(new Dimension(450, 500));
+        mainCard.setPreferredSize(new Dimension(480, 500));
 
         // Header Section
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
         headerPanel.setBackground(Color.WHITE);
         
-        JLabel titleLabel = createStyledLabel("Performance Summary", 18, new Color(100, 100, 100));
+        JLabel titleLabel = createStyledLabel("My Performance", 24, new Color(60, 60, 60));
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         headerPanel.add(titleLabel);
         headerPanel.add(Box.createVerticalStrut(20));
         
-        nameL = createStyledLabel("Player Name", 26, new Color(50, 50, 50));
-        levelL = createStyledLabel("Level", 16, new Color(120, 120, 120));
+        nameL = createStyledLabel("Player Name", 20, new Color(50, 50, 50));
+        levelL = createStyledLabel("Level", 14, new Color(120, 120, 120));
         headerPanel.add(nameL);
         headerPanel.add(Box.createVerticalStrut(5));
         headerPanel.add(levelL);
@@ -47,13 +48,13 @@ public class ScorePanel extends JPanel {
         JPanel centerPanel = new JPanel();
         centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
         centerPanel.setBackground(Color.WHITE);
-        centerPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
+        centerPanel.setBorder(new EmptyBorder(25, 0, 25, 0));
         
-        scoreL = createStyledLabel("0.0", 72, new Color(65, 105, 225));
+        scoreL = createStyledLabel("0.0", 48, new Color(65, 105, 225));
         JLabel overallLabel = createStyledLabel("Overall Score", 14, new Color(100, 100, 100));
         
         centerPanel.add(scoreL);
-        centerPanel.add(Box.createVerticalStrut(10));
+        centerPanel.add(Box.createVerticalStrut(8));
         centerPanel.add(overallLabel);
         
         mainCard.add(centerPanel, BorderLayout.CENTER);
@@ -66,14 +67,14 @@ public class ScorePanel extends JPanel {
         JSeparator separator = new JSeparator();
         separator.setForeground(new Color(230, 230, 230));
         scoresSection.add(separator);
-        scoresSection.add(Box.createVerticalStrut(20));
+        scoresSection.add(Box.createVerticalStrut(15));
         
         JLabel scoresTitle = createStyledLabel("Quiz Attempts", 16, new Color(100, 100, 100));
         scoresTitle.setAlignmentX(Component.CENTER_ALIGNMENT);
         scoresSection.add(scoresTitle);
-        scoresSection.add(Box.createVerticalStrut(15));
+        scoresSection.add(Box.createVerticalStrut(12));
         
-        scoresPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        scoresPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 8, 5));
         scoresPanel.setBackground(Color.WHITE);
         scoresSection.add(scoresPanel);
         
@@ -105,34 +106,49 @@ public class ScorePanel extends JPanel {
     private JPanel createScoreCard(int score, int attemptNum) {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setPreferredSize(new Dimension(55, 70));
-        card.setBorder(new LineBorder(new Color(220, 220, 220), 1, true));
+        card.setPreferredSize(new Dimension(70, 80));
+        
+        // Simplified styling
+        Color borderColor, backgroundColor, scoreColor;
         
         if (score > 0) {
-            card.setBackground(new Color(240, 255, 240));
+            if (score >= 4) {
+                borderColor = new Color(76, 175, 80); // Green
+                backgroundColor = new Color(245, 255, 245);
+                scoreColor = new Color(27, 94, 32);
+            } else if (score >= 3) {
+                borderColor = new Color(255, 193, 7); // Yellow
+                backgroundColor = new Color(255, 252, 229);
+                scoreColor = new Color(230, 81, 0);
+            } else {
+                borderColor = new Color(255, 152, 0); // Orange
+                backgroundColor = new Color(255, 248, 237);
+                scoreColor = new Color(191, 54, 12);
+            }
         } else {
-            card.setBackground(new Color(250, 250, 250));
+            borderColor = new Color(220, 220, 220);
+            backgroundColor = new Color(250, 250, 250);
+            scoreColor = new Color(158, 158, 158);
         }
         
+        card.setBorder(new LineBorder(borderColor, 1, true));
+        card.setBackground(backgroundColor);
+        
         JLabel attemptLabel = new JLabel("Q" + attemptNum, SwingConstants.CENTER);
-        attemptLabel.setFont(new Font("SansSerif", Font.PLAIN, 11));
+        attemptLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         attemptLabel.setForeground(new Color(100, 100, 100));
         attemptLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
         JLabel scoreLabel = new JLabel(score > 0 ? String.valueOf(score) : "—", SwingConstants.CENTER);
-        scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
-        if (score > 0) {
-            scoreLabel.setForeground(new Color(34, 139, 34));
-        } else {
-            scoreLabel.setForeground(new Color(180, 180, 180));
-        }
+        scoreLabel.setFont(new Font("SansSerif", Font.BOLD, 22));
+        scoreLabel.setForeground(scoreColor);
         scoreLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        card.add(Box.createVerticalStrut(8));
+        card.add(Box.createVerticalStrut(10));
         card.add(attemptLabel);
-        card.add(Box.createVerticalStrut(5));
+        card.add(Box.createVerticalStrut(6));
         card.add(scoreLabel);
-        card.add(Box.createVerticalStrut(8));
+        card.add(Box.createVerticalStrut(10));
         
         return card;
     }
@@ -162,6 +178,7 @@ public class ScorePanel extends JPanel {
             // Update individual score cards
             scoresPanel.removeAll();
             int[] scores = c.getScores();
+            
             // Always show 5 quiz attempts (Q1-Q5)
             for(int i = 0; i < 5; i++) {
                 int score = (i < scores.length) ? scores[i] : 0;
