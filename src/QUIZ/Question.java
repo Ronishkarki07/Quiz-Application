@@ -1,6 +1,6 @@
 package QUIZ;
 
-public class Question {
+public class Question implements QuestionProvider, Identifiable {
     private int id;
     private String questionText;
     private String optionA;
@@ -21,15 +21,23 @@ public class Question {
         this.difficultyLevel = difficultyLevel;
     }
 
+    @Override
+    public String getId() {
+        return String.valueOf(id);
+    }
+
+    @Override
     public String getQuestionText() {
         return questionText;
     }
 
     // Return all 4 options
+    @Override
     public String[] getOptions() {
         return new String[]{optionA, optionB, optionC, optionD};
     }
 
+    @Override
     public String getDifficultyLevel() {
         return difficultyLevel;
     }
@@ -38,6 +46,7 @@ public class Question {
      * Checks if the selected index (0-3) matches the correct letter (A-D).
      * @param selectedIndex 0 for A, 1 for B, 2 for C, 3 for D
      */
+    @Override
     public boolean isCorrect(int selectedIndex) {
         try {
             // Case 1: DB stores index as String "0", "1", "2", "3"

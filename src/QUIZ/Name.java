@@ -1,8 +1,6 @@
 package QUIZ;
 
-import java.util.Arrays;
-
-public class Name {
+public class Name implements PersonName {
     private String firstName;
     private String middleName;
     private String lastName;
@@ -19,30 +17,37 @@ public class Name {
     this.lastName = lastName;
     }
 
+    @Override
     public String getFirstName() {
         return firstName;
     }
 
+    @Override
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
+    @Override
     public String getMiddleName() {
         return middleName;
     }
 
+    @Override
     public void setMiddleName(String middleName) {
         this.middleName = middleName;
     }
 
+    @Override
     public String getLastName() {
         return lastName;
     }
 
+    @Override
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
+   @Override
    public String getFullName(){
         if (middleName == null || middleName.isEmpty()) {
             return firstName + " " + lastName;
@@ -51,6 +56,7 @@ public class Name {
         }
     }
 
+    @Override
     public String getInitials() {
         String initials = "" + firstName.charAt(0);
         if (middleName != null && !middleName.isEmpty()) {

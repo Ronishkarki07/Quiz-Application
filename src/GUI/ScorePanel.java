@@ -6,13 +6,11 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import java.awt.*;
-import java.util.Arrays;
 
 public class ScorePanel extends JPanel {
     private QuizMainFrame mainFrame;
-    private JLabel nameL, levelL, scoreL, progressLabel, achievementLabel;
+    private JLabel nameL, levelL, scoreL;
     private JPanel scoresPanel;
-    private JProgressBar progressBar;
 
     public ScorePanel(QuizMainFrame frame) {
         this.mainFrame = frame;

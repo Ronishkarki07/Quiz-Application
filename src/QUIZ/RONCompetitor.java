@@ -1,8 +1,6 @@
 package QUIZ;
 
-import java.util.Arrays;
-
-public class RONCompetitor {
+public class RONCompetitor implements Competitor, Identifiable, Scoreable {
     private String competitorID;
     private Name competitorName;
     private String competitorLevel;
@@ -23,6 +21,7 @@ public class RONCompetitor {
     }
 
     // --- NEW: Method to add a single quiz attempt score ---
+    @Override
     public boolean addQuizAttemptScore(int score) {
         for (int i = 0; i < scores.length; i++) {
             if (scores[i] == 0) { // Find first empty slot
@@ -33,6 +32,7 @@ public class RONCompetitor {
         return false; // No attempts left (Array full)
     }
 
+    @Override
     public double getOverallScore() {
         if (scores == null) return 0.0;
         double sum = 0;
@@ -50,20 +50,31 @@ public class RONCompetitor {
     }
 
     // Getters and Setters
+    @Override
     public String getCompetitorID() {
         return competitorID;
+    }
+
+    @Override
+    public String getId() {
+        return getCompetitorID();
     }
 
     public void setCompetitorID(String competitorID) {
         this.competitorID = competitorID;
     }
 
+    @Override
     public Name getCompetitorName() {
         return competitorName;
     }
+    
+    @Override
     public String getCompetitorLevel() {
         return competitorLevel;
     }
+    
+    @Override
     public void setCompetitorLevel(String level) {
         this.competitorLevel = level;
     }
@@ -76,14 +87,18 @@ public class RONCompetitor {
     public String getPassword() {
         return password;
     }
+    @Override
     public int[] getScores() {
-        return scores; }
+        return scores;
+    }
+    
+    @Override
     public void setScores(int[] scores) {
         this.scores = scores;
     }
 
+    @Override
     public String getFullDetails(){
-        String scoreString = Arrays.toString(scores).replace("[", "").replace("]", "");
         return ("Competitor ID "+ competitorID + ", named " + competitorName.getFirstName() + " " +
                 competitorName.getMiddleName() + " " +  competitorName.getLastName() +
                 ", country " + country) + "\n" +
@@ -91,6 +106,7 @@ public class RONCompetitor {
                 " and has an overall score of " + getOverallScore() + ".";
     }
 
+    @Override
     public String getShortDetails(){
         return ("Competitor Number " + competitorID + ", " +
                 competitorName.getInitials() + " has overall score of " +
