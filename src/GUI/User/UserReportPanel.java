@@ -128,7 +128,7 @@ public class UserReportPanel extends JPanel {
         }
         if (scoresList.length() == 0) scoresList.append("no scores yet");
 
-        return "CompetitorID " + c.getCompetitorID() + ", name " + c.getCompetitorName().getFullName() + ".\n\n" +
+        return "CompetitorID " + c.getCompetitorID() + ", name " + c.getCompetitorName().getFullName() + ".\n" +
                 c.getCompetitorName().getFirstName() + " is a " + c.getCompetitorLevel() +
                 " and received these scores: " + scoresList.toString() + ".\n" +
                 "This gives an overall score of " + String.format("%.1f", c.getOverallScore()) + ".";

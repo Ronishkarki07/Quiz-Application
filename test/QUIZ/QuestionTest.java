@@ -1,4 +1,4 @@
-package test.QUIZ;
+package QUIZ;
 
 import QUIZ.Question;
 

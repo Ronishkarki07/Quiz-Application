@@ -17,6 +17,7 @@ public class QuizPanel extends JPanel {
     private QuizMainFrame mainFrame;
     private ArrayList<Question> questions;
     private int currentIndex = 0;
+    private String currentLevel; // Store current difficulty level
 
     private int[] localResults = new int[5];
 
@@ -101,8 +102,9 @@ public class QuizPanel extends JPanel {
         add(footerPanel, BorderLayout.SOUTH);
     }
 
-    public void setupQuiz(ArrayList<Question> questions) {
+    public void setupQuiz(ArrayList<Question> questions, String level) {
         this.questions = questions;
+        this.currentLevel = level;
         this.currentIndex = 0;
         this.localResults = new int[5];
         showQuestion();
@@ -134,7 +136,10 @@ public class QuizPanel extends JPanel {
         }
 
         boolean correct = questions.get(currentIndex).isCorrect(selected);
-        localResults[currentIndex] = correct ? 1 : 0;
+        
+        // Weighted scoring based on difficulty level
+        int pointValue = getPointValueForLevel(currentLevel);
+        localResults[currentIndex] = correct ? pointValue : 0;
 
         if (++currentIndex < 5) {
             showQuestion();
@@ -144,21 +149,24 @@ public class QuizPanel extends JPanel {
     }
 
     private void finishQuizAndShowSummary() {
-        int totalCorrect = 0;
-        for(int s : localResults) totalCorrect += s;
+        int totalScore = 0;
+        for(int s : localResults) totalScore += s;
 
         RONCompetitor user = mainFrame.getCurrentUser();
         if(user != null) {
+            int maxPossibleScore = getMaxScoreForLevel(currentLevel);
+            
             String summaryText =
                     "Quiz Finished!\n\n" +
                             "Competitor: " + user.getCompetitorName().getFullName() + "\n" +
-                            "Score: " + totalCorrect + " / 5\n\n" +
+                            "Level: " + currentLevel + "\n" +
+                            "Score: " + totalScore + " / " + maxPossibleScore + "\n\n" +
                             "Result saved.";
 
             JOptionPane.showMessageDialog(mainFrame, summaryText, "Result", JOptionPane.INFORMATION_MESSAGE);
 
             // --- FIX: Using the correct method name from QuizMainFrame ---
-            mainFrame.saveQuizAttempt(totalCorrect);
+            mainFrame.saveQuizAttempt(totalScore);
         }
     }
 
@@ -217,5 +225,24 @@ public class QuizPanel extends JPanel {
         b.setBorder(new EmptyBorder(10, 25, 10, 25));
         b.setOpaque(true);
         b.setBorderPainted(false);
+    }
+
+    /**
+     * Returns point value per correct answer based on difficulty level
+     */
+    private int getPointValueForLevel(String level) {
+        switch (level.toLowerCase()) {
+            case "beginner": return 1;
+            case "intermediate": return 2;
+            case "advanced": return 3;
+            default: return 1; // Default to beginner scoring
+        }
+    }
+
+    /**
+     * Returns maximum possible score for the difficulty level
+     */
+    private int getMaxScoreForLevel(String level) {
+        return getPointValueForLevel(level) * 5; // 5 questions
     }
 }

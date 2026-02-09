@@ -1,5 +1,3 @@
-package test;
-
 /**
  * Simple test runner for QuizApp tests compatible with JUnit 5.14.0
  * Can be run as a main class to execute all tests

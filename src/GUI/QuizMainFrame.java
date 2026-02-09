@@ -113,7 +113,7 @@ public class QuizMainFrame extends JFrame {
         if (currentQuestions.size() < 5) {
             JOptionPane.showMessageDialog(this, "Not enough questions in DB for " + level);
         } else {
-            quizPanel.setupQuiz(currentQuestions);
+            quizPanel.setupQuiz(currentQuestions, level); // Pass level to QuizPanel
             showCard("QUIZ");
         }
     }

@@ -9,6 +9,8 @@ import javax.swing.border.LineBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 public class AdminReportPanel extends JPanel {
@@ -16,6 +18,7 @@ public class AdminReportPanel extends JPanel {
     private DefaultTableModel model;
     private JTextArea stats;
     private JTextField searchField;
+    private ArrayList<RONCompetitor> displayedCompetitors; // Store competitors in display order
 
     public AdminReportPanel(QuizMainFrame frame) {
         this.mainFrame = frame;
@@ -75,6 +78,20 @@ public class AdminReportPanel extends JPanel {
         };
         styleTable(table);
 
+        // Add mouse listener for row clicks
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 1) { // Single click
+                    int row = table.rowAtPoint(e.getPoint());
+                    if (row >= 0 && displayedCompetitors != null && row < displayedCompetitors.size()) {
+                        RONCompetitor competitor = displayedCompetitors.get(row);
+                        showCompetitorDetails(competitor);
+                    }
+                }
+            }
+        });
+
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(new EmptyBorder(20, 30, 0, 30));
         add(scrollPane, BorderLayout.CENTER);
@@ -112,6 +129,9 @@ public class AdminReportPanel extends JPanel {
 
         // 2. Get the list of RONCompetitor objects
         ArrayList<RONCompetitor> allCompetitors = mainFrame.getCompetitorList().getAllCompetitors();
+        
+        // Store filtered competitors in display order for click handling
+        displayedCompetitors = new ArrayList<>();
 
         String topName = "";
         double topScore = -1.0;
@@ -127,6 +147,9 @@ public class AdminReportPanel extends JPanel {
                     continue; // Skip if it doesn't match search
                 }
             }
+
+            // Add to displayed competitors list for click handling
+            displayedCompetitors.add(c);
 
             // 4. Get Data from Object
             String id = c.getCompetitorID();
@@ -185,5 +208,40 @@ public class AdminReportPanel extends JPanel {
         b.setForeground(Color.DARK_GRAY);
         b.setFocusPainted(false);
         b.setBorder(new LineBorder(Color.LIGHT_GRAY));
+    }
+
+    /**
+     * Shows detailed competitor information in a dialog
+     */
+    private void showCompetitorDetails(RONCompetitor competitor) {
+        String message = formatCompetitorDetails(competitor);
+        JOptionPane.showMessageDialog(this, message, "Competitor Details", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Formats competitor details according to specifications
+     */
+    private String formatCompetitorDetails(RONCompetitor competitor) {
+        String id = competitor.getCompetitorID();
+        String name = competitor.getCompetitorName().getFullName();
+        String level = competitor.getCompetitorLevel();
+        int[] scores = competitor.getScores();
+        double overallScore = competitor.getOverallScore();
+
+        // Format individual scores, filtering out non-attempted ones (0 values)
+        StringBuilder scoreText = new StringBuilder();
+        boolean first = true;
+        for (int score : scores) {
+            if (score > 0) { // Only include scores that were actually attempted
+                if (!first) scoreText.append(", ");
+                scoreText.append(score);
+                first = false;
+            }
+        }
+
+        return String.format("CompetitorID %s, name %s.\n" +
+                           "%s is a %s and received these scores: %s.\n" +
+                           "This gives an overall score of %.1f.",
+                           id, name, name, level, scoreText.toString(), overallScore);
     }
 }

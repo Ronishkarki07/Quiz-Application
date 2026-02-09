@@ -78,10 +78,7 @@ public class AdminLoginPanel extends JPanel {
             String p = new String(passField.getPassword());
 
             if(u.equals("admin") && p.equals("admin123")) {
-                JOptionPane.showMessageDialog(this, "Admin Login Successful!");
-
-                // *** CRITICAL FIX: Ensure no user is logged in ***
-                // This prevents the "Back" buttons in other panels from redirecting to the User Dashboard
+//                JOptionPane.showMessageDialog(this, "Admin Login Successful!");
                 mainFrame.setCurrentUser(null);
 
                 userField.setText("");

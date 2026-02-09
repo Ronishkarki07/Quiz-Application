@@ -106,15 +106,23 @@ public class ScorePanel extends JPanel {
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setPreferredSize(new Dimension(70, 80));
         
-        // Simplified styling
+        // Get current user's level for appropriate color thresholds
+        RONCompetitor currentUser = mainFrame.getCurrentUser();
+        String level = currentUser != null ? currentUser.getCompetitorLevel() : "Beginner";
+        
+        // Dynamic color thresholds based on difficulty level
         Color borderColor, backgroundColor, scoreColor;
         
         if (score > 0) {
-            if (score >= 4) {
+            int[] thresholds = getColorThresholds(level);
+            int greenThreshold = thresholds[0];
+            int yellowThreshold = thresholds[1];
+            
+            if (score >= greenThreshold) {
                 borderColor = new Color(76, 175, 80); // Green
                 backgroundColor = new Color(245, 255, 245);
                 scoreColor = new Color(27, 94, 32);
-            } else if (score >= 3) {
+            } else if (score >= yellowThreshold) {
                 borderColor = new Color(255, 193, 7); // Yellow
                 backgroundColor = new Color(255, 252, 229);
                 scoreColor = new Color(230, 81, 0);
@@ -186,6 +194,24 @@ public class ScorePanel extends JPanel {
             
             scoresPanel.revalidate();
             scoresPanel.repaint();
+        }
+    }
+
+    /**
+     * Returns color thresholds for score visualization based on difficulty level
+     * @param level The difficulty level (Beginner, Intermediate, Advanced)
+     * @return Array with [greenThreshold, yellowThreshold]
+     */
+    private int[] getColorThresholds(String level) {
+        switch (level.toLowerCase()) {
+            case "beginner":
+                return new int[]{4, 3}; // Green >= 4, Yellow >= 3, Orange < 3
+            case "intermediate":
+                return new int[]{8, 6}; // Green >= 8, Yellow >= 6, Orange < 6 (out of 10)
+            case "advanced":
+                return new int[]{12, 9}; // Green >= 12, Yellow >= 9, Orange < 9 (out of 15)
+            default:
+                return new int[]{4, 3}; // Default to beginner thresholds
         }
     }
 }

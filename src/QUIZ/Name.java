@@ -1,6 +1,6 @@
 package QUIZ;
 
-public class Name implements PersonName {
+public class Name {
     private String firstName;
     private String middleName;
     private String lastName;
@@ -17,38 +17,31 @@ public class Name implements PersonName {
     this.lastName = lastName;
     }
 
-    @Override
     public String getFirstName() {
         return firstName;
     }
 
-    @Override
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
-    @Override
     public String getMiddleName() {
         return middleName;
     }
 
-    @Override
     public void setMiddleName(String middleName) {
         this.middleName = middleName;
     }
 
-    @Override
     public String getLastName() {
         return lastName;
     }
 
-    @Override
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
-   @Override
-   public String getFullName(){
+    public String getFullName(){
         if (middleName == null || middleName.isEmpty()) {
             return firstName + " " + lastName;
         } else {
@@ -56,7 +49,6 @@ public class Name implements PersonName {
         }
     }
 
-    @Override
     public String getInitials() {
         String initials = "" + firstName.charAt(0);
         if (middleName != null && !middleName.isEmpty()) {
