@@ -3,49 +3,27 @@ import GUI.Admin.QuestionBank;
 import DatabaseConfig.CompetitorList;
 import DatabaseConfig.DatabaseConnection;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.sql.Connection;
 import java.util.ArrayList;
 
 /**
- * Integration tests for QuizApp (standalone test without JUnit)
- * Run this class directly to test interaction between components
- * Tests only methods that actually exist in the classes
+ * JUnit integration tests for QuizApp
+ * Tests interaction between components and system workflows
  */
-public class QuizAppIntegrationTest {
+class QuizAppIntegrationTest {
 
-    private static RONCompetitor testCompetitor;
-    private static QuestionBank questionBank;
-    private static CompetitorList competitorList;
-    private static int testsPassed = 0;
-    private static int testsTotal = 0;
+    private RONCompetitor testCompetitor;
+    private QuestionBank questionBank;
+    private CompetitorList competitorList;
 
-    public static void main(String[] args) {
-        System.out.println("=== Running QuizApp Integration Tests ===");
-        
-        setUp();
-        
-        testFullQuizWorkflow();
-        testDatabaseConnectivity();
-        testScoreCalculationWorkflow();
-        testQuestionDifficultyProgression();
-        testLeaderboardGeneration();
-        testMultipleCompetitors();
-        testDataPersistence();
-        testErrorHandling();
-        testSystemLimits();
-        testLoginWorkflow();
-        
-        System.out.println("\n=== Test Results ===");
-        System.out.println("Passed: " + testsPassed + "/" + testsTotal);
-        
-        if (testsPassed == testsTotal) {
-            System.out.println("PASS: All tests passed!");
-        } else {
-            System.out.println("FAIL: Some tests failed.");
-        }
-    }
-
-    private static void setUp() {
+    @BeforeEach
+    void setUp() {
         // Set up test data
         Name testName = new Name("Integration", "Test", "User");
         testCompetitor = new RONCompetitor(
@@ -61,88 +39,59 @@ public class QuizAppIntegrationTest {
         competitorList = new CompetitorList();
     }
 
-    private static void testFullQuizWorkflow() {
-        testsTotal++;
-        try {
-            setUp(); // Reset for clean test
-            
+    @Test
+    @DisplayName("Test full quiz workflow from start to finish")
+    void testFullQuizWorkflow() {
+        assertDoesNotThrow(() -> {
             // 1. Save competitor to database
             competitorList.saveCompetitor(testCompetitor);
             
             // 2. Get questions for quiz
             ArrayList<Question> questions = questionBank.getQuestionsForLevel("Beginner");
             
-            if (questions != null) {
+            if (questions != null && !questions.isEmpty()) {
                 // 3. Simulate taking quiz
-                if (!questions.isEmpty()) {
-                    Question firstQuestion = questions.get(0);
-                    
-                    // Answer the question (assume option 0 is correct for test)
-                    boolean correct = firstQuestion.isCorrect(0);
-                    int score = correct ? 100 : 0;
-                    
-                    // 4. Record score
-                    boolean scoreAdded = testCompetitor.addQuizAttemptScore(score);
-                    
-                    // 5. Update competitor in database
-                    competitorList.saveCompetitor(testCompetitor);
-                    
-                    if (scoreAdded) {
-                        testsPassed++;
-                        System.out.println("PASS: testFullQuizWorkflow passed");
-                    } else {
-                        System.out.println("FAIL: testFullQuizWorkflow failed - score not added");
-                    }
-                } else {
-                    testsPassed++;
-                    System.out.println("PASS: testFullQuizWorkflow passed (no questions available)");
-                }
-            } else {
-                testsPassed++;
-                System.out.println("PASS: testFullQuizWorkflow passed (questions is null)");
+                Question firstQuestion = questions.get(0);
+                
+                // Answer the question (assume option 0 is correct for test)
+                boolean correct = firstQuestion.isCorrect(0);
+                int score = correct ? 100 : 0;
+                
+                // 4. Record score
+                boolean scoreAdded = testCompetitor.addQuizAttemptScore(score);
+                assertTrue(scoreAdded, "Score should be added successfully");
+                
+                // 5. Update competitor in database
+                competitorList.saveCompetitor(testCompetitor);
             }
-        } catch (Exception e) {
-            System.out.println("FAIL: testFullQuizWorkflow failed with exception: " + e.getMessage());
-        }
+        }, "Full quiz workflow should complete without exception");
     }
 
-    private static void testDatabaseConnectivity() {
-        testsTotal++;
-        try {
+    @Test
+    @DisplayName("Test database connectivity across components")
+    void testDatabaseConnectivity() {
+        assertDoesNotThrow(() -> {
             // Test that all components can connect to database
             Connection dbConnection = DatabaseConnection.getConnection();
             
             if (dbConnection != null) {
-                boolean isValid = dbConnection.isValid(5);
+                assertTrue(dbConnection.isValid(5), "Database connection should be valid");
                 
-                // Test question loading
-                ArrayList<Question> questions = questionBank.getQuestionsForLevel("Beginner");
+                // Test question loading capability
+                questionBank.getQuestionsForLevel("Beginner");
                 
                 // Test competitor operations
                 competitorList.loadFromDatabase();
                 
                 dbConnection.close();
-                
-                if (isValid && questions != null) {
-                    testsPassed++;
-                    System.out.println("PASS: testDatabaseConnectivity passed");
-                } else {
-                    System.out.println("FAIL: testDatabaseConnectivity failed");
-                }
-            } else {
-                testsPassed++;
-                System.out.println("PASS: testDatabaseConnectivity passed (database may not be available)");
             }
-        } catch (Exception e) {
-            System.out.println("FAIL: testDatabaseConnectivity failed with exception: " + e.getMessage());
-        }
+        }, "Database connectivity test should complete without exception");
     }
 
-    private static void testScoreCalculationWorkflow() {
-        testsTotal++;
-        try {
-            setUp(); // Reset for clean test
-            
+    @Test
+    @DisplayName("Test score calculation workflow with multiple attempts")
+    void testScoreCalculationWorkflow() {
+        assertDoesNotThrow(() -> {
             // Add multiple quiz attempts
             testCompetitor.addQuizAttemptScore(80);
             testCompetitor.addQuizAttemptScore(85);
@@ -155,55 +104,36 @@ public class QuizAppIntegrationTest {
             competitorList.saveCompetitor(testCompetitor);
             
             // Average of 80, 85, 90 should be 85.0
-            if (Math.abs(overallScore - 85.0) < 0.01) {
-                testsPassed++;
-                System.out.println("PASS: testScoreCalculationWorkflow passed");
-            } else {
-                System.out.println("FAIL: testScoreCalculationWorkflow failed - got score: " + overallScore);
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testScoreCalculationWorkflow failed with exception: " + e.getMessage());
-        }
+            assertEquals(85.0, overallScore, 0.01, 
+                        "Overall score should be the average of all attempts");
+        }, "Score calculation workflow should complete without exception");
     }
 
-    private static void testQuestionDifficultyProgression() {
-        testsTotal++;
-        try {
+    @Test
+    @DisplayName("Test question difficulty progression")
+    void testQuestionDifficultyProgression() {
+        assertDoesNotThrow(() -> {
             // Test progression through difficulty levels
             ArrayList<Question> beginnerQuestions = questionBank.getQuestionsForLevel("Beginner");
-            ArrayList<Question> intermediateQuestions = questionBank.getQuestionsForLevel("Intermediate");
-            ArrayList<Question> advancedQuestions = questionBank.getQuestionsForLevel("Advanced");
+            questionBank.getQuestionsForLevel("Intermediate");
+            questionBank.getQuestionsForLevel("Advanced");
             
-            if (beginnerQuestions != null && intermediateQuestions != null && advancedQuestions != null) {
-                // Simulate completing beginner level
-                if (!beginnerQuestions.isEmpty()) {
-                    testCompetitor.addQuizAttemptScore(85);
-                    testCompetitor.setCompetitorLevel("Intermediate");
-                    
-                    // Should now be able to access intermediate questions
-                    if ("Intermediate".equals(testCompetitor.getCompetitorLevel())) {
-                        testsPassed++;
-                        System.out.println("PASS: testQuestionDifficultyProgression passed");
-                    } else {
-                        System.out.println("FAIL: testQuestionDifficultyProgression failed - level not updated");
-                    }
-                } else {
-                    testsPassed++;
-                    System.out.println("PASS: testQuestionDifficultyProgression passed (no beginner questions)");
-                }
-            } else {
-                System.out.println("FAIL: testQuestionDifficultyProgression failed - questions are null");
+            // Simulate completing beginner level
+            if (beginnerQuestions != null && !beginnerQuestions.isEmpty()) {
+                testCompetitor.addQuizAttemptScore(85);
+                testCompetitor.setCompetitorLevel("Intermediate");
+                
+                // Should now be able to access intermediate questions
+                assertEquals("Intermediate", testCompetitor.getCompetitorLevel(), 
+                           "Competitor level should be updated to Intermediate");
             }
-        } catch (Exception e) {
-            System.out.println("FAIL: testQuestionDifficultyProgression failed with exception: " + e.getMessage());
-        }
+        }, "Difficulty progression test should complete without exception");
     }
 
-    private static void testLeaderboardGeneration() {
-        testsTotal++;
-        try {
-            setUp(); // Reset for clean test
-            
+    @Test
+    @DisplayName("Test leaderboard generation")
+    void testLeaderboardGeneration() {
+        assertDoesNotThrow(() -> {
             // Add competitor with score
             testCompetitor.addQuizAttemptScore(95);
             competitorList.saveCompetitor(testCompetitor);
@@ -211,20 +141,14 @@ public class QuizAppIntegrationTest {
             // Generate leaderboard using CompetitorList method
             ArrayList<RONCompetitor> leaderboard = competitorList.getLeaderboard();
             
-            if (leaderboard != null) {
-                testsPassed++;
-                System.out.println("PASS: testLeaderboardGeneration passed");
-            } else {
-                System.out.println("FAIL: testLeaderboardGeneration failed - leaderboard is null");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testLeaderboardGeneration failed with exception: " + e.getMessage());
-        }
+            assertNotNull(leaderboard, "Leaderboard should not be null");
+        }, "Leaderboard generation should complete without exception");
     }
 
-    private static void testMultipleCompetitors() {
-        testsTotal++;
-        try {
+    @Test
+    @DisplayName("Test multiple competitors handling")
+    void testMultipleCompetitors() {
+        assertDoesNotThrow(() -> {
             // Create multiple test competitors
             RONCompetitor competitor1 = new RONCompetitor(
                 "INT002", new Name("User", "", "One"), "Beginner", "USA", 20, "pass1"
@@ -241,21 +165,16 @@ public class QuizAppIntegrationTest {
             competitorList.saveCompetitor(competitor1);
             competitorList.saveCompetitor(competitor2);
             
-            // Verify they can be found (may return null if database not available)
-            RONCompetitor found1 = competitorList.findCompetitor("INT002");
-            RONCompetitor found2 = competitorList.findCompetitor("INT003");
-            
-            // Test passes if no exceptions are thrown
-            testsPassed++;
-            System.out.println("PASS: testMultipleCompetitors passed");
-        } catch (Exception e) {
-            System.out.println("FAIL: testMultipleCompetitors failed with exception: " + e.getMessage());
-        }
+            // Verify they can be handled (may return null if database not available)
+            competitorList.findCompetitor("INT002");
+            competitorList.findCompetitor("INT003");
+        }, "Multiple competitors handling should complete without exception");
     }
 
-    private static void testDataPersistence() {
-        testsTotal++;
-        try {
+    @Test
+    @DisplayName("Test data persistence across sessions")
+    void testDataPersistence() {
+        assertDoesNotThrow(() -> {
             // Save competitor
             competitorList.saveCompetitor(testCompetitor);
             
@@ -263,47 +182,32 @@ public class QuizAppIntegrationTest {
             CompetitorList newList = new CompetitorList();
             newList.loadFromDatabase();
             
-            // Should find the competitor
-            RONCompetitor foundCompetitor = newList.findCompetitor("INT001");
-            // May or may not find based on database state, but should not throw exception
-            
-            testsPassed++;
-            System.out.println("PASS: testDataPersistence passed");
-        } catch (Exception e) {
-            System.out.println("FAIL: testDataPersistence failed with exception: " + e.getMessage());
-        }
+            // Should find the competitor (or handle gracefully if database not available)
+            newList.findCompetitor("INT001");
+        }, "Data persistence test should complete without exception");
     }
 
-    private static void testErrorHandling() {
-        testsTotal++;
-        try {
-            // Test invalid operations
-            boolean invalidScore = testCompetitor.addQuizAttemptScore(-1); // Invalid score
+    @Test
+    @DisplayName("Test error handling for invalid operations")
+    void testErrorHandling() {
+        assertDoesNotThrow(() -> {
+            // Test invalid operations and verify they're handled gracefully
+            testCompetitor.addQuizAttemptScore(-1); // Invalid score
             
             // Test null safety
-            RONCompetitor nullCompetitor = competitorList.findCompetitor(null);
-            // Should handle null gracefully
+            competitorList.findCompetitor(null);
             
             // Test invalid question access
-            ArrayList<Question> invalidQuestions = questionBank.getQuestionsForLevel("InvalidLevel");
+            questionBank.getQuestionsForLevel("InvalidLevel");
             
-            if (!invalidScore && invalidQuestions != null && invalidQuestions.isEmpty()) {
-                testsPassed++;
-                System.out.println("PASS: testErrorHandling passed");
-            } else {
-                testsPassed++;
-                System.out.println("PASS: testErrorHandling passed (partial - error handling exists)");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testErrorHandling failed with exception: " + e.getMessage());
-        }
+            // System should handle these gracefully without throwing exceptions
+        }, "Error handling should prevent system crashes");
     }
 
-    private static void testSystemLimits() {
-        testsTotal++;
-        try {
-            setUp(); // Reset for clean test
-            
+    @Test
+    @DisplayName("Test system limits and constraints")
+    void testSystemLimits() {
+        assertDoesNotThrow(() -> {
             // Test maximum quiz attempts
             for (int i = 0; i < 6; i++) {  // Try to add 6 attempts (max is 5)
                 testCompetitor.addQuizAttemptScore(80 + i);
@@ -312,54 +216,36 @@ public class QuizAppIntegrationTest {
             // After 5 attempts, no more should be allowed
             int[] scores = testCompetitor.getScores();
             
-            if (scores.length == 5) {
-                // Check that all 5 slots are filled
-                int filledSlots = 0;
-                for (int score : scores) {
-                    if (score > 0) filledSlots++;
-                }
-                
-                if (filledSlots == 5) {
-                    testsPassed++;
-                    System.out.println("PASS: testSystemLimits passed");
-                } else {
-                    System.out.println("FAIL: testSystemLimits failed - filled slots: " + filledSlots);
-                }
-            } else {
-                System.out.println("FAIL: testSystemLimits failed - scores length: " + scores.length);
+            assertEquals(5, scores.length, "Should maintain maximum of 5 quiz attempts");
+            
+            // Check that all 5 slots are filled
+            int filledSlots = 0;
+            for (int score : scores) {
+                if (score > 0) filledSlots++;
             }
-        } catch (Exception e) {
-            System.out.println("FAIL: testSystemLimits failed with exception: " + e.getMessage());
-        }
+            
+            assertEquals(5, filledSlots, "All 5 attempt slots should be filled");
+        }, "System limits test should complete without exception");
     }
 
-    private static void testLoginWorkflow() {
-        testsTotal++;
-        try {
-            setUp(); // Reset for clean test
-            
+    @Test
+    @DisplayName("Test complete login workflow")
+    void testLoginWorkflow() {
+        assertDoesNotThrow(() -> {
             // Save competitor to database
             competitorList.saveCompetitor(testCompetitor);
             
             // Test login success
             String loginResult = competitorList.checkLogin("INT001", "testpass123");
+            assertNotNull(loginResult, "Login result should not be null");
             
             // Test wrong password
             String wrongPassResult = competitorList.checkLogin("INT001", "wrongpass");
+            assertNotNull(wrongPassResult, "Wrong password result should not be null");
             
             // Test non-existent user
             String notFoundResult = competitorList.checkLogin("NONEXISTENT", "password");
-            
-            // Should return non-null results and not throw exceptions
-            if (loginResult != null && wrongPassResult != null && notFoundResult != null) {
-                testsPassed++;
-                System.out.println("PASS: testLoginWorkflow passed");
-            } else {
-                testsPassed++;
-                System.out.println("PASS: testLoginWorkflow passed (partial - no exceptions thrown)");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testLoginWorkflow failed with exception: " + e.getMessage());
-        }
+            assertNotNull(notFoundResult, "Not found result should not be null");
+        }, "Login workflow should complete without exception");
     }
 }

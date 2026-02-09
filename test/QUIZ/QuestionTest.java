@@ -1,223 +1,130 @@
 package QUIZ;
 
-import QUIZ.Question;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test class for Question functionality
- * Run this class directly to execute all tests
+ * JUnit test class for Question functionality
+ * Tests Question class methods using JUnit 5 framework
  */
-public class QuestionTest {
+class QuestionTest {
 
-    private static Question question;
-    private static int testsPassed = 0;
-    private static int testsTotal = 0;
+    private Question question;
 
-    public static void main(String[] args) {
-        System.out.println("=== Running Question Tests ===");
-        
-        setUp();
-        
-        testConstructor();
-        testGetOptions();
-        testIsCorrect_CorrectAnswer();
-        testIsCorrect_IncorrectAnswers();
-        testIsCorrect_InvalidIndex();
-        testCorrectAnswerValidation();
-        testDifferentDifficultyLevels();
-        testAllCorrectAnswerOptions();
-        testQuestionContent();
-        testQuestionProperties();
-        
-        System.out.println("\n=== Test Results ===");
-        System.out.println("Passed: " + testsPassed + "/" + testsTotal);
-        
-        if (testsPassed == testsTotal) {
-            System.out.println("PASS: All tests passed!");
-        } else {
-            System.out.println("FAIL: Some tests failed.");
-        }
-    }
-    private static void setUp() {
+    @BeforeEach
+    void setUp() {
         question = new Question(
-            1,
-            "What is the capital of France?",
-            "London",
-            "Berlin", 
-            "Paris",
-            "Madrid",
-            "C",
-            "Easy"
+                1,
+                "What is the capital of France?",
+                "London",
+                "Berlin",
+                "Paris",
+                "Madrid",
+                "C",
+                "Easy"
         );
     }
 
-    private static void testConstructor() {
-        testsTotal++;
-        try {
-            String id = question.getId();
-            String questionText = question.getQuestionText();
-            String difficulty = question.getDifficultyLevel();
-            
-            if ("1".equals(id) && "What is the capital of France?".equals(questionText) && "Easy".equals(difficulty)) {
-                testsPassed++;
-                System.out.println("PASS: testConstructor passed");
-            } else {
-                System.out.println("FAIL: testConstructor failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testConstructor failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test Question constructor initializes all fields correctly")
+    void testConstructor() {
+        assertAll("Question constructor should initialize all fields correctly",
+                () -> assertEquals("1", question.getId(), "Question ID should match constructor parameter"),
+                () -> assertEquals("What is the capital of France?", question.getQuestionText(), "Question text should match"),
+                () -> assertEquals("Easy", question.getDifficultyLevel(), "Difficulty should match")
+        );
     }
 
-    private static void testGetOptions() {
-        testsTotal++;
-        try {
-            String[] options = question.getOptions();
-            if (options != null && options.length == 4 && 
-                "London".equals(options[0]) && "Berlin".equals(options[1]) && 
-                "Paris".equals(options[2]) && "Madrid".equals(options[3])) {
-                testsPassed++;
-                System.out.println("PASS: testGetOptions passed");
-            } else {
-                System.out.println("FAIL: testGetOptions failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testGetOptions failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test getting question options array")
+    void testGetOptions() {
+        String[] options = question.getOptions();
+
+        assertAll("Options array should contain all four choices",
+                () -> assertNotNull(options, "Options array should not be null"),
+                () -> assertEquals(4, options.length, "Should have exactly 4 options"),
+                () -> assertEquals("London", options[0], "First option should be London"),
+                () -> assertEquals("Berlin", options[1], "Second option should be Berlin"),
+                () -> assertEquals("Paris", options[2], "Third option should be Paris"),
+                () -> assertEquals("Madrid", options[3], "Fourth option should be Madrid")
+        );
     }
 
-    private static void testIsCorrect_CorrectAnswer() {
-        testsTotal++;
-        try {
-            if (question.isCorrect(2)) { // C is correct
-                testsPassed++;
-                System.out.println("PASS: testIsCorrect_CorrectAnswer passed");
-            } else {
-                System.out.println("FAIL: testIsCorrect_CorrectAnswer failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testIsCorrect_CorrectAnswer failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test correct answer validation - option C")
+    void testIsCorrect_CorrectAnswer() {
+        // The correct answer is "C" which corresponds to index 2 (Paris)
+        assertTrue(question.isCorrect(2), "Option C (Paris) should be the correct answer");
     }
 
-    private static void testIsCorrect_IncorrectAnswers() {
-        testsTotal++;
-        try {
-            if (!question.isCorrect(0) && !question.isCorrect(1) && !question.isCorrect(3)) {
-                testsPassed++;
-                System.out.println("PASS: testIsCorrect_IncorrectAnswers passed");
-            } else {
-                System.out.println("FAIL: testIsCorrect_IncorrectAnswers failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testIsCorrect_IncorrectAnswers failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test incorrect answer validation")
+    void testIsCorrect_IncorrectAnswers() {
+        assertAll("Incorrect options should return false",
+                () -> assertFalse(question.isCorrect(0), "Option A (London) should be incorrect"),
+                () -> assertFalse(question.isCorrect(1), "Option B (Berlin) should be incorrect"),
+                () -> assertFalse(question.isCorrect(3), "Option D (Madrid) should be incorrect")
+        );
     }
 
-    private static void testIsCorrect_InvalidIndex() {
-        testsTotal++;
-        try {
-            if (!question.isCorrect(-1) && !question.isCorrect(4) && !question.isCorrect(10)) {
-                testsPassed++;
-                System.out.println("PASS: testIsCorrect_InvalidIndex passed");
-            } else {
-                System.out.println("FAIL: testIsCorrect_InvalidIndex failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testIsCorrect_InvalidIndex failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test question text getter")
+    void testGetQuestionText() {
+        String questionText = question.getQuestionText();
+        
+        assertAll("Question text should be properly formatted",
+                () -> assertNotNull(questionText, "Question text should not be null"),
+                () -> assertEquals("What is the capital of France?", questionText, "Question text should match constructor parameter"),
+                () -> assertTrue(questionText.contains("capital of France"), "Question should contain expected content")
+        );
     }
 
-    private static void testCorrectAnswerValidation() {
-        testsTotal++;
-        try {
-            if (question.isCorrect(2) && !question.isCorrect(0) && !question.isCorrect(1) && !question.isCorrect(3)) {
-                testsPassed++;
-                System.out.println("PASS: testCorrectAnswerValidation passed");
-            } else {
-                System.out.println("FAIL: testCorrectAnswerValidation failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testCorrectAnswerValidation failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test question ID getter")
+    void testGetId() {
+        assertEquals("1", question.getId(), "Question ID should match constructor parameter");
     }
 
-    private static void testDifferentDifficultyLevels() {
-        testsTotal++;
-        try {
-            Question easyQ = new Question(1, "Easy Question", "A", "B", "C", "D", "A", "Easy");
-            Question mediumQ = new Question(2, "Medium Question", "A", "B", "C", "D", "B", "Medium");
-            Question hardQ = new Question(3, "Hard Question", "A", "B", "C", "D", "C", "Hard");
-
-            if ("Easy".equals(easyQ.getDifficultyLevel()) && 
-                "Medium".equals(mediumQ.getDifficultyLevel()) &&
-                "Hard".equals(hardQ.getDifficultyLevel())) {
-                testsPassed++;
-                System.out.println("PASS: testDifferentDifficultyLevels passed");
-            } else {
-                System.out.println("FAIL: testDifferentDifficultyLevels failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testDifferentDifficultyLevels failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test difficulty level getter")
+    void testGetDifficultyLevel() {
+        assertEquals("Easy", question.getDifficultyLevel(), "Difficulty level should match constructor parameter");
     }
 
-    private static void testAllCorrectAnswerOptions() {
-        testsTotal++;
-        try {
-            Question questionA = new Question(1, "Test A", "Correct", "B", "C", "D", "A", "Easy");
-            Question questionB = new Question(2, "Test B", "A", "Correct", "C", "D", "B", "Easy");
-            Question questionC = new Question(3, "Test C", "A", "B", "Correct", "D", "C", "Easy");
-            Question questionD = new Question(4, "Test D", "A", "B", "C", "Correct", "D", "Easy");
+    @Test
+    @DisplayName("Test all correct answer positions work properly")
+    void testAllCorrectAnswerOptions() {
+        Question questionA = new Question(1, "Test A", "Correct", "B", "C", "D", "A", "Easy");
+        Question questionB = new Question(2, "Test B", "A", "Correct", "C", "D", "B", "Easy");
+        Question questionC = new Question(3, "Test C", "A", "B", "Correct", "D", "C", "Easy");
+        Question questionD = new Question(4, "Test D", "A", "B", "C", "Correct", "D", "Easy");
 
-            if (questionA.isCorrect(0) && questionB.isCorrect(1) && 
-                questionC.isCorrect(2) && questionD.isCorrect(3)) {
-                testsPassed++;
-                System.out.println("PASS: testAllCorrectAnswerOptions passed");
-            } else {
-                System.out.println("FAIL: testAllCorrectAnswerOptions failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testAllCorrectAnswerOptions failed with exception: " + e.getMessage());
-        }
+        assertAll("All answer positions should work as correct answers",
+                () -> assertTrue(questionA.isCorrect(0), "Answer A should be correct for questionA"),
+                () -> assertTrue(questionB.isCorrect(1), "Answer B should be correct for questionB"),
+                () -> assertTrue(questionC.isCorrect(2), "Answer C should be correct for questionC"),
+                () -> assertTrue(questionD.isCorrect(3), "Answer D should be correct for questionD")
+        );
     }
 
-    private static void testQuestionContent() {
-        testsTotal++;
-        try {
-            String questionText = question.getQuestionText();
-            String[] options = question.getOptions();
-            String difficulty = question.getDifficultyLevel();
-            
-            if (questionText != null && questionText.contains("capital of France") &&
-                options != null && options.length == 4 &&
-                difficulty != null && "Easy".equals(difficulty)) {
-                testsPassed++;
-                System.out.println("PASS: testQuestionContent passed");
-            } else {
-                System.out.println("FAIL: testQuestionContent failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testQuestionContent failed with exception: " + e.getMessage());
-        }
-    }
-
-    private static void testQuestionProperties() {
-        testsTotal++;
-        try {
-            String[] options = question.getOptions();
-            String id = question.getId();
-            
-            if (options != null && options.length == 4 &&
-                "London".equals(options[0]) && "Berlin".equals(options[1]) &&
-                "Paris".equals(options[2]) && "Madrid".equals(options[3]) &&
-                "1".equals(id)) {
-                testsPassed++;
-                System.out.println("PASS: testQuestionProperties passed");
-            } else {
-                System.out.println("FAIL: testQuestionProperties failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testQuestionProperties failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test question content validation")
+    void testQuestionContent() {
+        String questionText = question.getQuestionText();
+        String[] options = question.getOptions();
+        String id = question.getId();
+        
+        assertAll("Question content should be properly initialized",
+            () -> assertNotNull(questionText, "Question text should not be null"),
+            () -> assertNotNull(options, "Options should not be null"),
+            () -> assertEquals(4, options.length, "Should have exactly 4 options"),
+            () -> assertEquals("London", options[0], "First option should be London"),
+            () -> assertEquals("Berlin", options[1], "Second option should be Berlin"),
+            () -> assertEquals("Paris", options[2], "Third option should be Paris"),
+            () -> assertEquals("Madrid", options[3], "Fourth option should be Madrid"),
+            () -> assertEquals("1", id, "Question ID should match")
+        );
     }
 }

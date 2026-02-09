@@ -1,212 +1,116 @@
 package QUIZ;
 
-import QUIZ.Name;
-import QUIZ.RONCompetitor;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.DisplayName;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test class for RONCompetitor functionality (standalone test without JUnit)
- * Run this class directly to test RONCompetitor methods
+ * JUnit test class for RONCompetitor functionality
+ * Tests RONCompetitor class methods using JUnit 5 framework
  */
-public class RONCompetitorTest {
+class RONCompetitorTest {
 
-    private static RONCompetitor competitor;
-    private static Name testName;
-    private static int testsPassed = 0;
-    private static int testsTotal = 0;
+    private RONCompetitor competitor;
+    private Name testName;
 
-    public static void main(String[] args) {
-        System.out.println("=== Running RONCompetitor Tests ===");
-        
-        setUp();
-        
-        testConstructor();
-        testAddQuizAttemptScore_Success();
-        testAddQuizAttemptScore_ArrayFull();
-        testGetOverallScore_NoScores();
-        testGetOverallScore_WithScores();
-        testGetFullDetails();
-        testGetShortDetails();
-        testSetScores();
-        
-        System.out.println("\n=== Test Results ===");
-        System.out.println("Passed: " + testsPassed + "/" + testsTotal);
-        
-        if (testsPassed == testsTotal) {
-            System.out.println("PASS: All tests passed!");
-        } else {
-            System.out.println("FAIL: Some tests failed.");
-        }
-    }
-
-    private static void setUp() {
+    @BeforeEach
+    void setUp() {
         testName = new Name("John", "Middle", "Smith");
         competitor = new RONCompetitor("COMP001", testName, "Beginner", "USA", 25, "password123");
     }
 
-    private static void testConstructor() {
-        testsTotal++;
-        try {
-            boolean passed = "COMP001".equals(competitor.getCompetitorID()) &&
-                           testName.equals(competitor.getCompetitorName()) &&
-                           "Beginner".equals(competitor.getCompetitorLevel()) &&
-                           "USA".equals(competitor.getCountry()) &&
-                           25 == competitor.getAge() &&
-                           competitor.getScores() != null &&
-                           competitor.getScores().length == 5;
-                           
-            if (passed) {
-                testsPassed++;
-                System.out.println("PASS: testConstructor passed");
-            } else {
-                System.out.println("FAIL: testConstructor failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testConstructor failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test RONCompetitor constructor initializes all fields correctly")
+    void testConstructor() {
+        assertAll("RONCompetitor constructor should initialize all fields correctly",
+            () -> assertEquals("COMP001", competitor.getCompetitorID(), "Competitor ID should match"),
+            () -> assertEquals(testName, competitor.getCompetitorName(), "Name should match"),
+            () -> assertEquals("Beginner", competitor.getCompetitorLevel(), "Level should match"),
+            () -> assertEquals("USA", competitor.getCountry(), "Country should match"),
+            () -> assertEquals(25, competitor.getAge(), "Age should match"),
+            () -> assertNotNull(competitor.getScores(), "Scores array should not be null"),
+            () -> assertEquals(5, competitor.getScores().length, "Scores array should have length 5")
+        );
     }
 
-    private static void testAddQuizAttemptScore_Success() {
-        testsTotal++;
-        try {
-            setUp(); // Reset for clean test
-            
-            boolean addResult1 = competitor.addQuizAttemptScore(85);
-            boolean addResult2 = competitor.addQuizAttemptScore(90);
-            boolean addResult3 = competitor.addQuizAttemptScore(78);
-            
-            int[] scores = competitor.getScores();
-            boolean scoresCorrect = scores[0] == 85 && scores[1] == 90 && scores[2] == 78;
-            
-            if (addResult1 && addResult2 && addResult3 && scoresCorrect) {
-                testsPassed++;
-                System.out.println("PASS: testAddQuizAttemptScore_Success passed");
-            } else {
-                System.out.println("FAIL: testAddQuizAttemptScore_Success failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testAddQuizAttemptScore_Success failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test adding quiz attempt scores successfully")
+    void testAddQuizAttemptScore_Success() {
+        assertTrue(competitor.addQuizAttemptScore(85), "First score should be added successfully");
+        assertTrue(competitor.addQuizAttemptScore(90), "Second score should be added successfully");
+        assertTrue(competitor.addQuizAttemptScore(78), "Third score should be added successfully");
+        
+        int[] scores = competitor.getScores();
+        assertAll("Scores should be stored correctly",
+            () -> assertEquals(85, scores[0], "First score should match"),
+            () -> assertEquals(90, scores[1], "Second score should match"),
+            () -> assertEquals(78, scores[2], "Third score should match")
+        );
     }
 
-    private static void testAddQuizAttemptScore_ArrayFull() {
-        testsTotal++;
-        try {
-            setUp(); // Reset for clean test
-            
-            // Fill up the array
-            boolean add1 = competitor.addQuizAttemptScore(85);
-            boolean add2 = competitor.addQuizAttemptScore(90);
-            boolean add3 = competitor.addQuizAttemptScore(78);
-            boolean add4 = competitor.addQuizAttemptScore(88);
-            boolean add5 = competitor.addQuizAttemptScore(95);
-            
-            // Try to add one more (should fail)
-            boolean add6 = competitor.addQuizAttemptScore(100);
-            
-            if (add1 && add2 && add3 && add4 && add5 && !add6) {
-                testsPassed++;
-                System.out.println("PASS: testAddQuizAttemptScore_ArrayFull passed");
-            } else {
-                System.out.println("FAIL: testAddQuizAttemptScore_ArrayFull failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testAddQuizAttemptScore_ArrayFull failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test adding scores when array is full")
+    void testAddQuizAttemptScore_ArrayFull() {
+        // Fill up the array (5 attempts maximum)
+        assertTrue(competitor.addQuizAttemptScore(85), "Should add first score");
+        assertTrue(competitor.addQuizAttemptScore(90), "Should add second score");
+        assertTrue(competitor.addQuizAttemptScore(78), "Should add third score");
+        assertTrue(competitor.addQuizAttemptScore(88), "Should add fourth score");
+        assertTrue(competitor.addQuizAttemptScore(95), "Should add fifth score");
+        
+        // Try to add one more (should fail)
+        assertFalse(competitor.addQuizAttemptScore(100), "Should not add sixth score when array is full");
     }
 
-    private static void testGetOverallScore_NoScores() {
-        testsTotal++;
-        try {
-            setUp(); // Reset for clean test
-            
-            // New competitor should have overall score of 0
-            if (competitor.getOverallScore() == 0) {
-                testsPassed++;
-                System.out.println("PASS: testGetOverallScore_NoScores passed");
-            } else {
-                System.out.println("FAIL: testGetOverallScore_NoScores failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testGetOverallScore_NoScores failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test overall score calculation with no quiz attempts")
+    void testGetOverallScore_NoScores() {
+        assertEquals(0, competitor.getOverallScore(), "Overall score should be 0 when no quiz attempts exist");
     }
 
-    private static void testGetOverallScore_WithScores() {
-        testsTotal++;
-        try {
-            setUp(); // Reset for clean test
-            
-            competitor.addQuizAttemptScore(80);
-            competitor.addQuizAttemptScore(90);
-            competitor.addQuizAttemptScore(70);
-            
-            // Should calculate average: (80+90+70)/3 = 80
-            if (competitor.getOverallScore() == 80) {
-                testsPassed++;
-                System.out.println("PASS: testGetOverallScore_WithScores passed");
-            } else {
-                System.out.println("FAIL: testGetOverallScore_WithScores failed - got: " + competitor.getOverallScore());
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testGetOverallScore_WithScores failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test overall score calculation with multiple quiz attempts")
+    void testGetOverallScore_WithScores() {
+        competitor.addQuizAttemptScore(80);
+        competitor.addQuizAttemptScore(90);
+        competitor.addQuizAttemptScore(70);
+        
+        // Should calculate average: (80+90+70)/3 = 80
+        assertEquals(80, competitor.getOverallScore(), "Overall score should be the average of all attempts");
     }
 
-    private static void testGetFullDetails() {
-        testsTotal++;
-        try {
-            String fullDetails = competitor.getFullDetails();
-            boolean containsRequiredInfo = fullDetails != null &&
-                                         fullDetails.contains("COMP001") &&
-                                         fullDetails.contains("John") &&
-                                         fullDetails.contains("Smith");
-            
-            if (containsRequiredInfo) {
-                testsPassed++;
-                System.out.println("PASS: testGetFullDetails passed");
-            } else {
-                System.out.println("FAIL: testGetFullDetails failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testGetFullDetails failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test getting full competitor details")
+    void testGetFullDetails() {
+        String fullDetails = competitor.getFullDetails();
+        
+        assertAll("Full details should contain all required information",
+            () -> assertNotNull(fullDetails, "Full details should not be null"),
+            () -> assertTrue(fullDetails.contains("COMP001"), "Should contain competitor ID"),
+            () -> assertTrue(fullDetails.contains("John"), "Should contain first name"),
+            () -> assertTrue(fullDetails.contains("Smith"), "Should contain last name")
+        );
     }
 
-    private static void testGetShortDetails() {
-        testsTotal++;
-        try {
-            String shortDetails = competitor.getShortDetails();
-            boolean containsRequiredInfo = shortDetails != null &&
-                                         shortDetails.contains("COMP001");
-            
-            if (containsRequiredInfo) {
-                testsPassed++;
-                System.out.println("PASS: testGetShortDetails passed");
-            } else {
-                System.out.println("FAIL: testGetShortDetails failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testGetShortDetails failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test getting short competitor details")
+    void testGetShortDetails() {
+        String shortDetails = competitor.getShortDetails();
+        
+        assertAll("Short details should contain essential information",
+            () -> assertNotNull(shortDetails, "Short details should not be null"),
+            () -> assertTrue(shortDetails.contains("COMP001"), "Should contain competitor ID")
+        );
     }
 
-    private static void testSetScores() {
-        testsTotal++;
-        try {
-            int[] newScores = {90, 85, 95, 88, 92};
-            competitor.setScores(newScores);
-            
-            int[] retrievedScores = competitor.getScores();
-            boolean arraysEqual = java.util.Arrays.equals(newScores, retrievedScores);
-            
-            if (arraysEqual) {
-                testsPassed++;
-                System.out.println("PASS: testSetScores passed");
-            } else {
-                System.out.println("FAIL: testSetScores failed");
-            }
-        } catch (Exception e) {
-            System.out.println("FAIL: testSetScores failed with exception: " + e.getMessage());
-        }
+    @Test
+    @DisplayName("Test setting competitor scores array")
+    void testSetScores() {
+        int[] newScores = {90, 85, 95, 88, 92};
+        competitor.setScores(newScores);
+        
+        int[] retrievedScores = competitor.getScores();
+        assertArrayEquals(newScores, retrievedScores, "Set scores should match retrieved scores");
     }
 }
