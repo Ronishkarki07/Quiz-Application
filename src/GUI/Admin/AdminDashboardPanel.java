@@ -84,7 +84,7 @@ public class AdminDashboardPanel extends JPanel {
         styleLogoutButton(logoutBtn);
         logoutBtn.addActionListener(e -> {
             mainFrame.setCurrentUser(null);
-            mainFrame.showCard("LOGIN");
+            mainFrame.showCard("ROLE_SELECTION");
         });
 
         cardGbc.gridy++;
