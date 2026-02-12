@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * <p>This class serves as the primary data access layer for competitor management,
  * handling all CRUD operations and providing specialized methods for leaderboard
  * generation and user authentication.</p>
- * 
+ * zz
  * @author Ronish Karki
  * @version 1.0
  * @since 1.0
